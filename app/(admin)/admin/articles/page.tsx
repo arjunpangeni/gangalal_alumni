@@ -3,6 +3,8 @@ import Article from "@/lib/models/Article";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { AdminArticlesClient, type AdminArticleRow } from "./AdminArticlesClient";
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function AdminArticlesPage() {
   await connectDB();
   const raw = await Article.find({ deletedAt: null })

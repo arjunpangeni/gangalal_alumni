@@ -3,6 +3,8 @@ import Job from "@/lib/models/Job";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { AdminJobsClient, type AdminJobRow } from "./AdminJobsClient";
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function AdminJobsPage() {
   await connectDB();
 

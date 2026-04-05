@@ -9,6 +9,8 @@ import { FileText, User, Heart, Briefcase } from "lucide-react";
 import Job from "@/lib/models/Job";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function DashboardPage() {
   const session = await auth();
   await connectDB();

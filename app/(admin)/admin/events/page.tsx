@@ -5,6 +5,8 @@ import { AdminEventsClient } from "./AdminEventsClient";
 import { formatDate } from "@/lib/utils";
 import { Calendar } from "lucide-react";
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function AdminEventsPage() {
   await connectDB();
 

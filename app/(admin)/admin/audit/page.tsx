@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { PageShell, PageHeader, PageEmptyState } from "@/components/layout/Page";
 import { ClipboardList } from "lucide-react";
 
+export const unstable_dynamicStaleTime = 30;
+
 interface AuditDoc {
   _id: string;
   adminId?: { name: string; email: string };

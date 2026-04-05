@@ -10,6 +10,8 @@ import { MyArticlesActions } from "./MyArticlesActions";
 import { formatDate, cn } from "@/lib/utils";
 import { PageShell, PageHeader, PageEmptyState } from "@/components/layout/Page";
 
+export const unstable_dynamicStaleTime = 30;
+
 interface ArticleRow {
   _id: string;
   title: string;

@@ -6,6 +6,8 @@ import { PageShell, PageHeader } from "@/components/layout/Page";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function DashboardMentorshipPage() {
   const session = await auth();
   await connectDB();

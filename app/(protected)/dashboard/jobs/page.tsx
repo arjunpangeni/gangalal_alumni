@@ -10,6 +10,8 @@ import { Briefcase, Pencil, Plus, MapPin, Calendar } from "lucide-react";
 import { redirect } from "next/navigation";
 import { PageShell, PageHeader, PageEmptyState } from "@/components/layout/Page";
 
+export const unstable_dynamicStaleTime = 30;
+
 const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   draft: "outline",
   pending: "secondary",

@@ -6,6 +6,8 @@ import { JobEditorForm } from "@/components/jobs/JobEditorForm";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import type { Metadata } from "next";
 
+export const unstable_dynamicStaleTime = 30;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   return { title: `Edit job · ${slug}` };

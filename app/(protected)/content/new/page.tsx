@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Write Article" };
 
+export const unstable_dynamicStaleTime = 30;
+
 export default function NewArticlePage() {
   return (
     <PageShell narrow className="px-0">

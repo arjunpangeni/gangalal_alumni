@@ -4,6 +4,8 @@ import { PageShell, PageHeader, PageEmptyState } from "@/components/layout/Page"
 import { Users } from "lucide-react";
 import { AdminUsersClient } from "./AdminUsersClient";
 
+export const unstable_dynamicStaleTime = 30;
+
 interface UserDoc {
   _id: string;
   name: string;

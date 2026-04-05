@@ -11,6 +11,8 @@ import { PageShell } from "@/components/layout/Page";
 import { ArrowLeft, Calendar, Globe, Lock, Pencil } from "lucide-react";
 import type { Metadata } from "next";
 
+export const unstable_dynamicStaleTime = 30;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   await connectDB();

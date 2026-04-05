@@ -3,6 +3,8 @@ import Notice from "@/lib/models/Notice";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { AdminNoticesClient, type AdminNoticeRow } from "./AdminNoticesClient";
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function AdminNoticesPage() {
   await connectDB();
   const raw = await Notice.find({ deletedAt: null })

@@ -3,6 +3,8 @@ import Album from "@/lib/models/Album";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { AdminGalleryClient, type AdminAlbumRow } from "./AdminGalleryClient";
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function AdminGalleryPage() {
   await connectDB();
 

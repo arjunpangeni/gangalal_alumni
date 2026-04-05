@@ -7,6 +7,8 @@ import { PageShell, PageHeader } from "@/components/layout/Page";
 import { sanitizeArticleEditorReturnPath } from "@/lib/sanitize-return-path";
 import type { Metadata } from "next";
 
+export const unstable_dynamicStaleTime = 30;
+
 export async function generateMetadata({
   params,
 }: {

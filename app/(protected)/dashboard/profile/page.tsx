@@ -4,6 +4,8 @@ import User from "@/lib/models/User";
 import { ProfilePageClient, type ProfileViewUser } from "./ProfilePageClient";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function ProfilePage() {
   const session = await auth();
   await connectDB();

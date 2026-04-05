@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { ManageAdminsClient } from "./ManageAdminsClient";
 
+export const unstable_dynamicStaleTime = 30;
+
 interface UserDoc {
   _id: string;
   name: string;

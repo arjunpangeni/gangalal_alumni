@@ -6,6 +6,8 @@ import { PageShell, PageHeader } from "@/components/layout/Page";
 
 export const metadata: Metadata = { title: "Post a job" };
 
+export const unstable_dynamicStaleTime = 30;
+
 export default async function NewJobPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
