@@ -30,12 +30,10 @@ function getClientPromise(): Promise<MongoClient> {
 }
 
 export const authConfig: NextAuthConfig = {
-  // In production (`npm run start`), NextAuth blocks requests for "untrusted" hosts
-  // unless `trustHost` is enabled. During local testing we want to allow localhost.
-  trustHost:
-    process.env.NODE_ENV !== "production" ||
-    (process.env.NEXTAUTH_URL ?? "").includes("localhost") ||
-    (process.env.NEXTAUTH_URL ?? "").includes("127.0.0.1"),
+  // Auth.js rejects requests when the forwarded Host is not trusted (UntrustedHost).
+  // Vercel terminates TLS and sets x-forwarded-* — VERCEL=1 in all deployments.
+  // See https://errors.authjs.dev#untrustedhost
+  trustHost: process.env.VERCEL === "1" || process.env.NODE_ENV !== "production",
   adapter: MongoDBAdapter(getClientPromise()),
   providers: [
     Google({
