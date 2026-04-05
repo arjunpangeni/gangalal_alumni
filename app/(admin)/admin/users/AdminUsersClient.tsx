@@ -60,6 +60,7 @@ export function AdminUsersClient({ initialUsers }: { initialUsers: User[] }) {
   const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState<"all" | "staff" | "user">("all");
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
   const [actingId, setActingId] = useState<string | null>(null);
@@ -83,10 +84,14 @@ export function AdminUsersClient({ initialUsers }: { initialUsers: User[] }) {
 
   const filtered = users.filter((u) => {
     const matchesStatus = statusFilter === "all" || u.status === statusFilter;
+    const matchesRole =
+      roleFilter === "all" ||
+      (roleFilter === "staff" && isStaffRole(u.role)) ||
+      (roleFilter === "user" && u.role === "user");
     const q = debouncedSearch.toLowerCase();
     const matchesSearch =
       !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
-    return matchesStatus && matchesSearch;
+    return matchesStatus && matchesRole && matchesSearch;
   });
 
   async function performAction(userId: string, action: string, extra?: object) {
@@ -356,6 +361,22 @@ export function AdminUsersClient({ initialUsers }: { initialUsers: User[] }) {
                 {s === "all" ? "All statuses" : s}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={roleFilter}
+          onValueChange={(v) => {
+            if (v === "staff" || v === "user") setRoleFilter(v);
+            else setRoleFilter("all");
+          }}
+        >
+          <SelectTrigger className="w-full sm:w-[11rem] shrink-0">
+            <SelectValue placeholder="Filter role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All roles</SelectItem>
+            <SelectItem value="staff">Admins</SelectItem>
+            <SelectItem value="user">Users</SelectItem>
           </SelectContent>
         </Select>
       </div>

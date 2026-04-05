@@ -13,12 +13,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Props {
   initial: { availableForMentorship: boolean; mentorshipBio: string; mentorshipSkills: string[] };
 }
 
 export function MentorshipToggle({ initial }: Props) {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [newSkill, setNewSkill] = useState("");
   const { register, handleSubmit, watch, setValue } = useForm<MentorshipUpdateInput>({
@@ -152,9 +154,14 @@ export function MentorshipToggle({ initial }: Props) {
         </Card>
       ) : null}
 
-      <Button type="submit" disabled={submitting} className="min-h-11 w-full gradient-primary border-0 text-white sm:w-auto">
-        {submitting ? "Saving…" : "Save settings"}
-      </Button>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button type="button" variant="outline" className="min-h-11 w-full sm:w-auto" onClick={() => router.push("/dashboard")}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={submitting} className="min-h-11 w-full gradient-primary border-0 text-white sm:w-auto">
+          {submitting ? "Saving…" : "Save settings"}
+        </Button>
+      </div>
     </form>
   );
 }

@@ -155,7 +155,10 @@ export function NewArticleForm() {
         {errors.content && <p className="text-xs text-destructive">Content is required</p>}
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <Button type="button" variant="outline" onClick={() => router.push("/dashboard/articles")}>
+          Cancel
+        </Button>
         {publishesDirectly ? (
           <Button
             type="button"
