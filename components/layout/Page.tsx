@@ -31,7 +31,7 @@ export function PageHeader({
   return (
     <div className={cn("mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between", className)}>
       <div className="space-y-1.5">
-        <h1 className="text-title sm:text-3xl sm:font-bold sm:tracking-tight">{title}</h1>
+        <h1 className="font-heading text-title sm:text-3xl sm:font-bold sm:tracking-tight">{title}</h1>
         {description ? (
           <div className="max-w-2xl text-sm text-muted-foreground sm:text-base [&_strong]:font-medium [&_strong]:text-foreground">
             {description}
@@ -44,7 +44,9 @@ export function PageHeader({
 }
 
 export function SectionHeader({ title, className }: { title: string; className?: string }) {
-  return <h2 className={cn("mb-4 text-lg font-semibold tracking-tight sm:mb-5 sm:text-xl", className)}>{title}</h2>;
+  return (
+    <h2 className={cn("font-heading mb-4 text-lg font-semibold tracking-tight sm:mb-5 sm:text-xl", className)}>{title}</h2>
+  );
 }
 
 export function PageEmptyState({
@@ -61,7 +63,7 @@ export function PageEmptyState({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-dashed border-border/80 bg-muted/25 px-4 py-14 text-center dark:border-border/60 dark:bg-muted/20",
+        "rounded-2xl border border-dashed border-border/70 bg-muted/30 px-4 py-14 text-center shadow-inner transition-surface dark:border-border/55 dark:bg-muted/18 sm:rounded-3xl",
         className
       )}
     >

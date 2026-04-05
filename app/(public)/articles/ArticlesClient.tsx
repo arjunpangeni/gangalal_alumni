@@ -46,49 +46,50 @@ export function ArticlesClient() {
   }, [debouncedSearch, fetchArticles]);
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-b from-card to-card/80 shadow-md ring-1 ring-border/30 dark:from-card/90 dark:to-card/60 dark:ring-border/40">
-        <div className="border-b border-border/50 bg-muted/30 px-4 py-3 dark:bg-muted/20 sm:px-5">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            <Search className="size-3.5 text-primary" aria-hidden />
-            Search articles
-          </div>
+    <div className="space-y-5 sm:space-y-6">
+      <div className="flex flex-col gap-3 border-b border-border/50 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pb-5 lg:pb-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">Articles</h1>
+          <p className="mt-0.5 truncate text-xs leading-snug text-muted-foreground sm:text-sm">
+            Articles and opinions by verified members.
+            {(!loading || articles.length > 0) && (
+              <span className="text-muted-foreground/80">
+                {" "}
+                · <span className="tabular-nums text-foreground/90">{articles.length}</span>{" "}
+                {articles.length === 1 ? "article" : "articles"}
+              </span>
+            )}
+          </p>
         </div>
-
-        <div className="p-6 sm:p-7">
-          <div className="relative">
-            <Search
-              className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground/80"
+        <div className="relative w-full shrink-0 sm:max-w-[13.5rem]">
+          <Search
+            className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/75"
+            aria-hidden
+          />
+          <Input
+            placeholder="Title, tags, or author name…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-9 rounded-lg border-border/60 bg-background/90 py-2 pl-8 pr-16 text-sm shadow-sm transition-surface dark:bg-background/50"
+            aria-label="Search articles"
+          />
+          {search ? (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-8 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-surface hover:bg-muted hover:text-foreground"
+              aria-label="Clear search"
+            >
+              <X className="size-3.5" />
+            </button>
+          ) : null}
+          {loading && debouncedSearch.trim() ? (
+            <Loader2
+              className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 animate-spin text-primary"
               aria-hidden
             />
-            <Input
-              placeholder="Article title, content, or tags…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="h-12 rounded-2xl border-border/70 bg-background/90 pl-12 pr-24 text-base shadow-inner dark:bg-background/50"
-              aria-label="Search articles"
-            />
-            {search ? (
-              <button
-                type="button"
-                onClick={() => setSearch("")}
-                className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                aria-label="Clear search"
-              >
-                <X className="size-4" />
-              </button>
-            ) : null}
-            {loading && debouncedSearch.trim() ? (
-              <Loader2 className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 animate-spin text-primary sm:right-12" aria-hidden />
-            ) : null}
-          </div>
+          ) : null}
         </div>
-      </div>
-
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>
-          Showing <span className="font-semibold tabular-nums text-foreground">{articles.length}</span> articles
-        </span>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">

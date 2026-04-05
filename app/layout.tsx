@@ -1,14 +1,30 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Devanagari } from "next/font/google";
+import { Fraunces, Noto_Sans_Devanagari, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { NETWORK_NAME, NETWORK_TAGLINE } from "@/lib/brand";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 
 const notoDevanagari = Noto_Sans_Devanagari({
   subsets: ["devanagari", "latin", "latin-ext"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-noto-devanagari",
+  display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
   display: "swap",
 });
 
@@ -24,9 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="ne"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={notoDevanagari.variable}
+      className={cn(notoDevanagari.variable, plusJakarta.variable, fraunces.variable)}
     >
-      <body className="min-h-screen bg-background font-sans antialiased">
+      <body className="min-h-screen antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
           <Toaster richColors position="top-right" />

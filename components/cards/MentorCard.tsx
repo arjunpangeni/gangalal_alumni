@@ -1,10 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 import { buildCloudinaryUrl } from "@/lib/cloudinary-url";
-import { Building2, Mail, MapPin, UserRound, ExternalLink } from "lucide-react";
+import { Building2, ChevronDown, ChevronUp, Mail, MapPin, UserRound, ExternalLink } from "lucide-react";
 import Link from "next/link";
+
+const BIO_COLLAPSE_CHARS = 96;
 
 interface MentorCardProps {
   name: string;
@@ -31,38 +36,40 @@ export function MentorCard({
   linkedin,
   userId,
 }: MentorCardProps) {
-  const imgSrc = image ? buildCloudinaryUrl(image, { width: 112, height: 112, crop: "fill", gravity: "face" }) : "";
+  const [bioExpanded, setBioExpanded] = useState(false);
+  const imgSrc = image ? buildCloudinaryUrl(image, { width: 88, height: 88, crop: "fill", gravity: "face" }) : "";
   const mailHref = `mailto:${email}?subject=${encodeURIComponent(`Mentorship inquiry – ${name}`)}`;
+  const bio = mentorshipBio?.trim() ?? "";
+  const bioNeedsToggle = bio.length > BIO_COLLAPSE_CHARS;
 
   return (
     <article
       className={cn(
-        "flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md transition-all duration-200 hover:shadow-lg",
-        "dark:border-gray-700 dark:bg-gray-900 dark:hover:shadow-lg"
+        "group/card flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/95 text-sm shadow-card ring-1 ring-primary/[0.05] transition-surface",
+        "hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_10px_28px_oklch(0.35_0.1_264/0.1)]",
+        "dark:border-border/45 dark:bg-card/90"
       )}
     >
-      <div className="border-b border-gray-200 bg-gray-50 px-4 pb-4 pt-5 dark:border-gray-700 dark:bg-gray-800 sm:px-5">
-        <div className="flex items-start gap-3 sm:gap-4">
-          <Avatar className="size-14 shrink-0 ring-2 ring-gray-300 dark:ring-gray-600 sm:size-16">
-            <AvatarImage src={imgSrc || image || ""} alt={name} />
-            <AvatarFallback className="bg-gray-200 text-lg font-bold text-gray-700 dark:bg-gray-700 dark:text-gray-200">{name.charAt(0)}</AvatarFallback>
+      <div className="border-b border-border/50 bg-muted/30 px-3 pb-3 pt-3.5 dark:bg-muted/20">
+        <div className="flex items-start gap-2.5">
+          <Avatar className="size-10 shrink-0 ring-2 ring-border/50 transition-surface group-hover/card:ring-primary/35">
+            <AvatarImage src={imgSrc || image || ""} alt="" />
+            <AvatarFallback className="bg-primary/10 text-sm font-bold text-primary">{name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <h3 className="text-base font-semibold leading-tight tracking-tight text-black dark:text-white sm:text-lg">{name}</h3>
-            {profession ? (
-              <p className="mt-0.5 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">{profession}</p>
-            ) : null}
-            <div className="mt-2 flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400 sm:flex-row sm:flex-wrap sm:gap-x-4">
+            <h3 className="font-heading text-sm font-semibold leading-tight tracking-tight text-foreground">{name}</h3>
+            {profession ? <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{profession}</p> : null}
+            <div className="mt-1.5 flex flex-col gap-0.5 text-[11px] text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-3">
               {company ? (
-                <span className="inline-flex items-center gap-1">
-                  <Building2 className="size-3.5 shrink-0" aria-hidden />
-                  <span className="line-clamp-1">{company}</span>
+                <span className="inline-flex min-w-0 items-center gap-1">
+                  <Building2 className="size-3 shrink-0 opacity-80" aria-hidden />
+                  <span className="truncate">{company}</span>
                 </span>
               ) : null}
               {city ? (
                 <span className="inline-flex items-center gap-1">
-                  <MapPin className="size-3.5 shrink-0" aria-hidden />
-                  {city}
+                  <MapPin className="size-3 shrink-0 opacity-80" aria-hidden />
+                  <span className="line-clamp-1">{city}</span>
                 </span>
               ) : null}
             </div>
@@ -70,37 +77,60 @@ export function MentorCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-4 px-4 py-4 sm:px-5 sm:py-5">
-        <div className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-3 dark:border-blue-900 dark:bg-blue-950">
-          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-blue-900 dark:text-blue-100">
-            <Mail className="size-3.5 shrink-0" aria-hidden />
-            Connect by email
-          </p>
-          <p className="mt-1.5 text-sm leading-relaxed text-blue-950 dark:text-blue-50">
-            Reach out to <span className="font-semibold">{name}</span> using the address below. Introduce yourself
-            and what you would like help with.
+      <div className="flex flex-1 flex-col gap-2.5 px-3 py-3">
+        <div className="rounded-xl border border-primary/18 bg-primary/[0.05] px-2.5 py-2 dark:border-primary/22 dark:bg-primary/[0.08]">
+          <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+            <Mail className="size-3 shrink-0" aria-hidden />
+            Email
           </p>
           <a
             href={mailHref}
-            className="mt-2 inline-flex max-w-full items-center gap-2 break-all text-sm font-semibold text-blue-900 underline decoration-blue-600/40 underline-offset-2 hover:text-blue-950 hover:decoration-blue-700 dark:text-blue-100 dark:decoration-blue-400/50 dark:hover:text-blue-50"
+            className="mt-1 block truncate text-xs font-semibold text-primary underline decoration-primary/30 underline-offset-2 transition-surface hover:decoration-primary"
           >
             {email}
           </a>
         </div>
 
-        {mentorshipBio ? (
-          <p className="line-clamp-4 text-sm leading-relaxed text-gray-700 dark:text-gray-300 sm:line-clamp-5">
-            {mentorshipBio}
-          </p>
+        {bio ? (
+          <div className="min-h-0">
+            <p
+              className={cn(
+                "text-xs leading-relaxed text-muted-foreground",
+                !bioExpanded && bioNeedsToggle && "line-clamp-2"
+              )}
+            >
+              {bio}
+            </p>
+            {bioNeedsToggle ? (
+              <button
+                type="button"
+                onClick={() => setBioExpanded((v) => !v)}
+                aria-expanded={bioExpanded}
+                className="mt-1 inline-flex items-center gap-1 rounded-md px-1 py-0.5 text-xs font-medium text-primary transition-surface hover:bg-primary/10"
+              >
+                {bioExpanded ? (
+                  <>
+                    Show less
+                    <ChevronUp className="size-3.5 shrink-0" aria-hidden />
+                  </>
+                ) : (
+                  <>
+                    Read full bio
+                    <ChevronDown className="size-3.5 shrink-0" aria-hidden />
+                  </>
+                )}
+              </button>
+            ) : null}
+          </div>
         ) : null}
 
         {mentorshipSkills && mentorshipSkills.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5">
-            {mentorshipSkills.slice(0, 8).map((skill) => (
+          <div className="flex flex-wrap gap-1">
+            {mentorshipSkills.slice(0, 5).map((skill) => (
               <Badge
                 key={skill}
                 variant="secondary"
-                className="border-gray-300 bg-gray-100 text-xs font-normal text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                className="border-border/50 bg-muted/45 px-1.5 py-0 text-[10px] font-normal leading-tight text-foreground dark:border-border/40"
               >
                 {skill}
               </Badge>
@@ -108,26 +138,26 @@ export function MentorCard({
           </div>
         ) : null}
 
-        <div className="mt-auto flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
+        <div className="mt-auto flex flex-col gap-1.5 pt-0.5 sm:flex-row sm:flex-wrap">
           <a
             href={mailHref}
             className={cn(
-              buttonVariants({ size: "default" }),
-              "min-h-11 w-full justify-center gap-2 gradient-primary border-0 text-white sm:flex-1"
+              buttonVariants({ size: "sm" }),
+              "h-9 w-full justify-center gap-1.5 border-0 bg-gradient-to-br from-primary to-indigo-600 text-primary-foreground shadow-sm transition-surface hover:opacity-[0.96] sm:flex-1"
             )}
           >
-            <Mail className="size-4 shrink-0" />
-            Email {name.split(" ")[0] ?? name}
+            <Mail className="size-3.5 shrink-0" />
+            Email
           </a>
           <Link
             href={`/members/${userId}`}
             className={cn(
-              buttonVariants({ variant: "outline", size: "default" }),
-              "min-h-11 w-full justify-center gap-2 border-gray-300 bg-white text-black hover:bg-gray-100 sm:w-auto sm:flex-1 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "h-9 w-full justify-center gap-1.5 transition-surface sm:w-auto sm:flex-1"
             )}
           >
-            <UserRound className="size-4 shrink-0" aria-hidden />
-            View profile
+            <UserRound className="size-3.5 shrink-0" aria-hidden />
+            Profile
           </Link>
           {linkedin ? (
             <a
@@ -135,11 +165,11 @@ export function MentorCard({
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                buttonVariants({ variant: "outline", size: "default" }),
-                "min-h-11 w-full justify-center gap-2 border-gray-300 bg-white text-black hover:bg-gray-100 sm:w-auto dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "h-9 w-full justify-center gap-1.5 transition-surface sm:w-auto"
               )}
             >
-              <ExternalLink className="size-4 shrink-0" />
+              <ExternalLink className="size-3.5 shrink-0" />
               LinkedIn
             </a>
           ) : null}

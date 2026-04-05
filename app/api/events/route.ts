@@ -4,7 +4,7 @@ import { badRequest, forbidden, serverError, tooManyRequests } from "@/lib/error
 import { createEventSchema } from "@/lib/validations/event";
 import connectDB from "@/lib/db";
 import Event from "@/lib/models/Event";
-import { sanitizeInput } from "@/lib/utils";
+import { escapeRegex, sanitizeInput } from "@/lib/utils";
 import { applyRateLimit, writeLimiter } from "@/lib/ratelimit";
 import slugify from "slugify";
 
@@ -13,16 +13,31 @@ export async function GET(req: NextRequest) {
     await connectDB();
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
-    const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20"));
+    const limit = Math.min(80, Math.max(1, parseInt(searchParams.get("limit") ?? "20")));
+    const q = searchParams.get("q")?.trim();
+
+    const baseFilter = { status: "published" as const, deletedAt: null };
+    const filter =
+      q && q.length > 0
+        ? {
+            ...baseFilter,
+            $or: [
+              { title: new RegExp(escapeRegex(q), "i") },
+              { description: new RegExp(escapeRegex(q), "i") },
+              { venue: new RegExp(escapeRegex(q), "i") },
+              { tags: new RegExp(escapeRegex(q), "i") },
+            ],
+          }
+        : baseFilter;
 
     const [events, total] = await Promise.all([
-      Event.find({ status: "published", deletedAt: null })
+      Event.find(filter)
         .sort({ startDate: 1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .select("title slug description startDate venue capacity tags")
         .lean(),
-      Event.countDocuments({ status: "published", deletedAt: null }),
+      Event.countDocuments(filter),
     ]);
 
     return NextResponse.json({ success: true, data: events, meta: { page, limit, total } });

@@ -77,7 +77,7 @@ export function ChatbotWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-20 right-4 z-50 w-[min(380px,calc(100vw-2rem))] md:bottom-6"
+            className="fixed bottom-40 right-4 z-50 w-[min(380px,calc(100vw-2rem))] md:bottom-6"
           >
             <div className="flex flex-col rounded-2xl border shadow-2xl bg-background overflow-hidden max-h-[70vh]">
               {/* Header */}
@@ -176,7 +176,7 @@ export function ChatbotWidget() {
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-4 z-50 md:bottom-6 flex size-14 items-center justify-center rounded-full gradient-primary text-white shadow-lg shadow-violet-500/30 md:right-6"
+        className="fixed bottom-24 right-4 z-50 flex size-14 items-center justify-center rounded-full gradient-primary text-white shadow-lg shadow-violet-500/30 md:bottom-6 md:right-6"
         aria-label="Open AI chat"
       >
         <AnimatePresence mode="wait">

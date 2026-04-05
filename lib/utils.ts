@@ -74,6 +74,11 @@ export function truncate(str: string, maxLen: number): string {
   return str.slice(0, maxLen - 3) + "...";
 }
 
+/** Escape a string for safe use inside `RegExp` (user search, filters). */
+export function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export function extractPlateText(node: Record<string, unknown> | unknown[]): string {
   if (Array.isArray(node)) return node.map((n) => extractPlateText(n as Record<string, unknown>)).join(" ");
   if (typeof node === "object" && node !== null) {

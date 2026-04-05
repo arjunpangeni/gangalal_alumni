@@ -4,7 +4,8 @@ import { badRequest, serverError, tooManyRequests } from "@/lib/errors";
 import { createArticleSchema } from "@/lib/validations/article";
 import connectDB from "@/lib/db";
 import Article from "@/lib/models/Article";
-import { sanitizeInput, hashContent, estimateReadTime, extractPlateText, checkCorsOrigin } from "@/lib/utils";
+import User from "@/lib/models/User";
+import { escapeRegex, sanitizeInput, hashContent, estimateReadTime, extractPlateText, checkCorsOrigin } from "@/lib/utils";
 import { applyRateLimit, writeLimiter } from "@/lib/ratelimit";
 import { ingestArticle } from "@/lib/rag";
 import slugify from "slugify";
@@ -21,7 +22,22 @@ export async function GET(req: NextRequest) {
 
     const filter: Record<string, unknown> = { status: "published", deletedAt: null };
     if (tag) filter.tags = tag;
-    if (q) filter.$text = { $search: q };
+    if (q?.trim()) {
+      const trimmed = q.trim();
+      const tokens = trimmed.split(/\s+/).filter(Boolean);
+      const authorIds =
+        tokens.length > 0
+          ? await User.find({
+              status: "approved",
+              $and: tokens.map((t) => ({ name: new RegExp(escapeRegex(t), "i") })),
+            }).distinct("_id")
+          : [];
+      if (authorIds.length > 0) {
+        filter.$or = [{ $text: { $search: trimmed } }, { authorId: { $in: authorIds } }];
+      } else {
+        filter.$text = { $search: trimmed };
+      }
+    }
 
     const [articles, total] = await Promise.all([
       Article.find(filter)

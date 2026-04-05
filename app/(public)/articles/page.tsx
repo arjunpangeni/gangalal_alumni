@@ -1,18 +1,17 @@
 import { ArticlesClient } from "./ArticlesClient";
 import type { Metadata } from "next";
-import { PageShell, PageHeader } from "@/components/layout/Page";
+import { PageShell } from "@/components/layout/Page";
+import { PageListingShell } from "@/components/layout/PageListingShell";
 
 export const metadata: Metadata = { title: "Articles" };
 export const dynamic = "force-dynamic";
 
 export default function ArticlesPage() {
   return (
-    <PageShell className="max-w-6xl">
-      <PageHeader
-        title="Articles"
-        description="Stories, guides, and updates from verified members—readable on any device."
-      />
-      <ArticlesClient />
-    </PageShell>
+    <PageListingShell>
+      <PageShell className="max-w-6xl">
+        <ArticlesClient />
+      </PageShell>
+    </PageListingShell>
   );
 }

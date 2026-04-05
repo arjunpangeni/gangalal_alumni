@@ -6,11 +6,11 @@ import { FooterLink } from "./FooterLink";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/80 bg-muted/40 py-10 dark:bg-muted/25 sm:py-12">
+    <footer className="border-t border-border/60 bg-muted/35 py-10 transition-surface dark:bg-muted/22 sm:py-12">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
-          <div className="col-span-1 sm:col-span-2 md:col-span-1">
-            <Link href="/" className="mb-3 flex items-center gap-2 text-lg font-bold text-foreground">
+        <div className="grid grid-cols-1 gap-8 text-center sm:grid-cols-2 sm:text-left md:grid-cols-4 md:text-left">
+          <div className="col-span-1 flex flex-col items-center sm:col-span-2 sm:items-start md:col-span-1 md:items-start">
+            <Link href="/" className="mb-3 flex items-center justify-center gap-2 text-lg font-bold text-foreground sm:justify-start">
               <div className="flex size-8 items-center justify-center rounded-lg gradient-primary shadow-sm">
                 <GraduationCap className="size-5 text-white" />
               </div>
@@ -20,9 +20,9 @@ export function Footer() {
               Building stronger connections for students and graduates across Nepal.
             </p>
           </div>
-          <div>
+          <div className="flex flex-col items-center sm:items-start">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground/80">Community</h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="flex flex-col items-center space-y-2 text-sm sm:items-start">
               <li>
                 <FooterLink href="/members">Members</FooterLink>
               </li>
@@ -37,9 +37,9 @@ export function Footer() {
               </li>
             </ul>
           </div>
-          <div>
+          <div className="flex flex-col items-center sm:items-start">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground/80">Content</h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="flex flex-col items-center space-y-2 text-sm sm:items-start">
               <li>
                 <FooterLink href="/articles">Articles</FooterLink>
               </li>
@@ -54,9 +54,9 @@ export function Footer() {
               </li>
             </ul>
           </div>
-          <div>
+          <div className="flex flex-col items-center sm:items-start">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground/80">Account</h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="flex flex-col items-center space-y-2 text-sm sm:items-start">
               <li>
                 <FooterLink href="/auth/login">Sign In</FooterLink>
               </li>

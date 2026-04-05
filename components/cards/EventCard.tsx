@@ -18,7 +18,7 @@ export function EventCard({ title, slug, description, startDate, venue, capacity
   const bsDate = formatDateDayMonth(startDate);
 
   return (
-    <article className="group flex h-full flex-col rounded-2xl border bg-card p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+    <article className="group flex h-full flex-col rounded-2xl border border-border/60 bg-card/95 p-5 shadow-card ring-1 ring-primary/[0.04] transition-surface hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_12px_36px_oklch(0.35_0.1_264/0.12)] dark:border-border/45 sm:rounded-3xl sm:p-6">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="flex h-10 w-20 shrink-0 flex-col items-center justify-center rounded-lg gradient-primary text-white text-[0.65rem] font-bold leading-tight">
           <span>{bsDate.day}</span>
@@ -28,7 +28,7 @@ export function EventCard({ title, slug, description, startDate, venue, capacity
           {isPast ? "Past" : "Upcoming"}
         </Badge>
       </div>
-      <h3 className="mb-2 font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+      <h3 className="font-heading mb-2 font-semibold leading-snug transition-surface group-hover:text-primary line-clamp-2">
         <Link href={`/events/${slug}`}>{title}</Link>
       </h3>
       <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{description}</p>

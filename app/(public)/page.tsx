@@ -9,11 +9,11 @@ import Notice from "@/lib/models/Notice";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { EventCard } from "@/components/cards/EventCard";
 import { MentorCard } from "@/components/cards/MentorCard";
+import { HomeExploreTiles } from "@/components/home/HomeExploreTiles";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
-import { SectionHeader } from "@/components/layout/Page";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +50,33 @@ interface UserDoc {
   mentorshipSkills?: string[];
 }
 
+const panel =
+  "rounded-3xl border border-border/60 bg-card/60 shadow-card ring-1 ring-primary/[0.04] dark:border-border/50 dark:bg-card/50 sm:rounded-[1.75rem]";
+
+function SectionTitle({
+  title,
+  subtitle,
+  href,
+  linkLabel,
+}: {
+  title: string;
+  subtitle: string;
+  href: string;
+  linkLabel: string;
+}) {
+  return (
+    <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h2 className="font-heading text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{title}</h2>
+        <p className="mt-1 max-w-xl text-sm text-muted-foreground">{subtitle}</p>
+      </div>
+      <Link href={href} className={cn(buttonVariants({ variant: "outline", size: "sm" }), "shrink-0 gap-1.5 self-start sm:self-auto")}>
+        {linkLabel} <ArrowRight className="size-3.5" aria-hidden />
+      </Link>
+    </div>
+  );
+}
+
 export default async function HomePage() {
   let articles: ArticleDoc[] = [];
   let events: EventDoc[] = [];
@@ -78,6 +105,7 @@ export default async function HomePage() {
         .select("title slug description startDate venue capacity tags")
         .lean(),
       User.find({ status: "approved", availableForMentorship: true })
+        .sort({ createdAt: -1 })
         .limit(4)
         .select("name email image profile mentorshipBio mentorshipSkills")
         .lean(),
@@ -118,105 +146,129 @@ export default async function HomePage() {
       { label: "Events Hosted", value: eventCount },
       { label: "Mentors Available", value: mentorCount },
     ];
-  } catch { /* DB unavailable - show empty state */ }
+  } catch {
+    /* DB unavailable */
+  }
+
+  const hasNotices = notices.length > 0;
 
   return (
-    <>
-      <HeroSection />
-      <NoticeStrip notices={notices} />
-      <StatsStrip stats={stats} />
+    <div className="min-h-screen">
+      {/* Hero first; notices sit in a separate panel below when present */}
+      <section className="relative overflow-visible bg-gradient-to-b from-background via-background to-muted/25 pb-6 dark:to-muted/10 sm:pb-8">
+        <div
+          className={cn(
+            "relative mx-3 mt-3 overflow-hidden rounded-[1.75rem] border border-border/50 shadow-[0_4px_24px_oklch(0.35_0.08_264/0.08)] dark:border-border/40 sm:mx-4 sm:mt-4 sm:rounded-[2rem] md:mx-6 md:rounded-[2.25rem] lg:mx-auto lg:mt-5 lg:max-w-7xl"
+          )}
+        >
+          <HeroSection className="rounded-[inherit] py-16 md:py-20 lg:py-24" />
+        </div>
 
-      {/* Latest Articles */}
-      <section className="border-t border-border/60 bg-background py-12 sm:py-16 dark:border-border/50">
-        <div className="container mx-auto px-4">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <SectionHeader title="Latest articles" className="mb-1" />
-            <p className="mt-1 max-w-lg text-sm text-muted-foreground sm:text-base">Stories and insights from the community</p>
+        {hasNotices ? (
+          <div className="mx-auto mt-5 max-w-7xl px-3 sm:mt-6 sm:px-4 md:px-6 lg:px-3">
+            <div className={cn(panel, "p-4 sm:p-5 md:p-6")}>
+              <NoticeStrip notices={notices} embedded />
+            </div>
           </div>
-          <Link href="/articles" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "shrink-0 gap-1.5 self-start sm:self-auto")}>
-            View all <ArrowRight className="size-3.5" aria-hidden />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {articles.map((a) => (
-            <ArticleCard
-              key={String(a._id)}
-              title={a.title}
-              slug={a.slug}
-              excerpt={a.excerpt}
-              coverImage={a.coverImage}
-              tags={a.tags}
-              readTime={a.readTime}
-              authorName={a.authorId?.name}
-              authorImage={a.authorId?.image}
-              createdAt={a.createdAt}
-            />
-          ))}
-        </div>
+        ) : null}
+
+        {/* Explore */}
+        <div className="relative z-10 mx-auto mt-5 max-w-7xl px-3 sm:mt-6 sm:px-4 md:px-6 lg:px-3">
+          <div className={cn(panel, "p-4 sm:p-5 md:p-6")}>
+            <HomeExploreTiles />
+          </div>
         </div>
       </section>
 
-      {/* Upcoming Events */}
-      <section className="border-t border-border/60 bg-muted/25 py-12 dark:bg-muted/15 sm:py-16">
-        <div className="container mx-auto px-4">
-          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <SectionHeader title="Upcoming events" className="mb-1" />
-              <p className="mt-1 max-w-lg text-sm text-muted-foreground sm:text-base">Reconnect at community gatherings</p>
+      {/* Stats in rounded shell */}
+      <div className="mx-auto max-w-7xl px-3 py-6 sm:px-4 md:px-6 lg:px-3 lg:py-8">
+        <div className={cn(panel, "overflow-hidden p-4 sm:p-5 md:p-6")}>
+          <StatsStrip stats={stats} bare />
+        </div>
+      </div>
+
+      {/* Articles + events bento */}
+      <section className="mx-auto max-w-7xl px-3 pb-10 sm:px-4 md:px-6 lg:px-3 lg:pb-12">
+        <div className={cn(panel, "p-4 sm:p-5 md:p-6 lg:p-8")}>
+          <div className="grid gap-8 lg:grid-cols-12 lg:gap-8 xl:gap-10">
+            <div className="lg:col-span-8">
+              <SectionTitle
+                title="Latest articles"
+                subtitle="Articles and opinions from verified members."
+                href="/articles"
+                linkLabel="View all"
+              />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+                {articles.map((a) => (
+                  <ArticleCard
+                    key={String(a._id)}
+                    title={a.title}
+                    slug={a.slug}
+                    excerpt={a.excerpt}
+                    coverImage={a.coverImage}
+                    tags={a.tags}
+                    readTime={a.readTime}
+                    authorName={a.authorId?.name}
+                    authorImage={a.authorId?.image}
+                    createdAt={a.createdAt}
+                  />
+                ))}
+              </div>
             </div>
-            <Link href="/events" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "shrink-0 gap-1.5 self-start sm:self-auto")}>
-              View all <ArrowRight className="size-3.5" aria-hidden />
-            </Link>
+            <aside className="rounded-2xl border border-border/40 bg-muted/20 p-4 dark:border-border/30 dark:bg-muted/15 sm:rounded-3xl sm:p-5 lg:col-span-4">
+              <SectionTitle
+                title="Upcoming events"
+                subtitle="Workshops, reunions, and meetups."
+                href="/events"
+                linkLabel="All events"
+              />
+              <div className="flex flex-col gap-4">
+                {events.map((e) => (
+                  <EventCard
+                    key={String(e._id)}
+                    title={e.title}
+                    slug={e.slug}
+                    description={e.description}
+                    startDate={e.startDate}
+                    venue={e.venue}
+                    capacity={e.capacity}
+                    tags={e.tags}
+                  />
+                ))}
+              </div>
+            </aside>
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-            {events.map((e) => (
-              <EventCard
-                key={String(e._id)}
-                title={e.title}
-                slug={e.slug}
-                description={e.description}
-                startDate={e.startDate}
-                venue={e.venue}
-                capacity={e.capacity}
-                tags={e.tags}
+        </div>
+      </section>
+
+      {/* Mentors */}
+      <section className="mx-auto max-w-7xl px-3 pb-12 sm:px-4 md:px-6 lg:px-3 lg:pb-16">
+        <div className={cn(panel, "bg-muted/25 p-4 dark:bg-muted/20 sm:p-5 md:p-6 lg:p-8")}>
+          <SectionTitle
+            title="Featured mentors"
+            subtitle="Members open to mentoring—reach out by email."
+            href="/mentorship"
+            linkLabel="Find a mentor"
+          />
+          <div className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+            {mentors.map((m) => (
+              <MentorCard
+                key={String(m._id)}
+                userId={String(m._id)}
+                name={m.name}
+                email={m.email}
+                image={m.image}
+                profession={m.profile?.profession}
+                company={m.profile?.company}
+                city={m.profile?.city}
+                linkedin={m.profile?.linkedin}
+                mentorshipBio={m.mentorshipBio}
+                mentorshipSkills={m.mentorshipSkills}
               />
             ))}
           </div>
         </div>
       </section>
-
-      {/* Featured Mentors */}
-      <section className="border-t border-border/60 bg-background py-12 sm:py-16 dark:border-border/50">
-        <div className="container mx-auto px-4">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <SectionHeader title="Featured mentors" className="mb-1" />
-            <p className="mt-1 max-w-lg text-sm text-muted-foreground sm:text-base">Learn from members open to mentoring</p>
-          </div>
-          <Link href="/mentorship" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "shrink-0 gap-1.5 self-start sm:self-auto")}>
-            View all <ArrowRight className="size-3.5" aria-hidden />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-          {mentors.map((m) => (
-            <MentorCard
-              key={String(m._id)}
-              userId={String(m._id)}
-              name={m.name}
-              email={m.email}
-              image={m.image}
-              profession={m.profile?.profession}
-              company={m.profile?.company}
-              city={m.profile?.city}
-              linkedin={m.profile?.linkedin}
-              mentorshipBio={m.mentorshipBio}
-              mentorshipSkills={m.mentorshipSkills}
-            />
-          ))}
-        </div>
-        </div>
-      </section>
-    </>
+    </div>
   );
 }

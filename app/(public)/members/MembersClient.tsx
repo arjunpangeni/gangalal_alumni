@@ -4,19 +4,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { MemberCard } from "@/components/cards/MemberCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Search,
-  Loader2,
-  GraduationCap,
-  Globe,
-  MapPin,
-  X,
-  Sparkles,
-  ChevronDown,
-} from "lucide-react";
+import { Search, Loader2, X } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
-import { memberMatchesTokens, searchTokens } from "@/lib/member-match";
-import { cn } from "@/lib/utils";
 
 export interface MemberProfile {
   profession?: string;
@@ -37,37 +26,63 @@ export interface Member {
   profile?: MemberProfile;
 }
 
-export function MembersClient({ initialMembers }: { initialMembers: Member[] }) {
-  const [members, setMembers] = useState<Member[]>(initialMembers);
+type MemberFilters = {
+  search: string;
+  batch: string;
+  country: string;
+  city: string;
+  profession: string;
+};
+
+function filtersEmpty(f: MemberFilters) {
+  return (
+    !f.search.trim() &&
+    !f.batch.trim() &&
+    !f.country.trim() &&
+    !f.city.trim() &&
+    !f.profession.trim()
+  );
+}
+
+export function MembersClient({
+  initialMembers,
+  totalCount,
+}: {
+  initialMembers: Member[];
+  totalCount: number;
+}) {
   const [search, setSearch] = useState("");
-  const [batchFilter, setBatchFilter] = useState("");
-  const [countryFilter, setCountryFilter] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
+  const [batch, setBatch] = useState("");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [profession, setProfession] = useState("");
+
+  const filterForm = useMemo(
+    () => ({ search, batch, country, city, profession }),
+    [search, batch, country, city, profession]
+  );
+  const debouncedFilters = useDebounce(filterForm, 300);
+
+  const [members, setMembers] = useState<Member[]>(initialMembers);
   const [loading, setLoading] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
-  const [refineOpen, setRefineOpen] = useState(false);
-  const debouncedSearch = useDebounce(search, 300);
   const hasHydratedRef = useRef(false);
+  const debouncedFiltersRef = useRef(debouncedFilters);
+  debouncedFiltersRef.current = debouncedFilters;
 
-  const clientTokens = useMemo(() => {
-    const combined = [batchFilter, countryFilter, locationFilter].filter(Boolean).join(" ");
-    return searchTokens(combined);
-  }, [batchFilter, countryFilter, locationFilter]);
-
-  const displayMembers = useMemo(() => {
-    if (clientTokens.length === 0) return members;
-    return members.filter((m) => memberMatchesTokens(m, clientTokens));
-  }, [members, clientTokens]);
-
-  const refineActiveCount = [batchFilter, countryFilter, locationFilter].filter((s) => s.trim()).length;
-
-  const fetchMembers = useCallback(async (q: string, after?: string) => {
+  const fetchMembers = useCallback(async (after?: string) => {
+    const f = debouncedFiltersRef.current;
     setLoading(true);
     try {
       const params = new URLSearchParams({ limit: "20" });
-      if (q) params.set("q", q);
+      if (f.search.trim()) params.set("q", f.search.trim());
+      if (f.batch.trim()) params.set("batch", f.batch.trim());
+      if (f.country.trim()) params.set("country", f.country.trim());
+      if (f.city.trim()) params.set("city", f.city.trim());
+      if (f.profession.trim()) params.set("profession", f.profession.trim());
       if (after) params.set("after", after);
+
       const res = await fetch(`/api/members?${params}`);
       const json = await res.json();
       if (json.success) {
@@ -88,10 +103,13 @@ export function MembersClient({ initialMembers }: { initialMembers: Member[] }) 
   useEffect(() => {
     if (!hasHydratedRef.current) {
       hasHydratedRef.current = true;
-      if (!debouncedSearch.trim() && initialMembers.length > 0) return;
+      if (filtersEmpty(debouncedFilters) && initialMembers.length > 0) return;
     }
-    fetchMembers(debouncedSearch);
-  }, [debouncedSearch, fetchMembers, initialMembers.length]);
+    setMembers([]);
+    setCursor(null);
+    setHasMore(true);
+    void fetchMembers();
+  }, [debouncedFilters, fetchMembers, initialMembers.length]);
 
   const observerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -99,159 +117,131 @@ export function MembersClient({ initialMembers }: { initialMembers: Member[] }) 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && cursor) {
-          fetchMembers(debouncedSearch, cursor);
+          void fetchMembers(cursor);
         }
       },
       { threshold: 0.5 }
     );
     if (observerRef.current) observer.observe(observerRef.current);
     return () => observer.disconnect();
-  }, [cursor, hasMore, loading, debouncedSearch, fetchMembers]);
+  }, [cursor, hasMore, loading, fetchMembers]);
 
-  const showRefineHint = clientTokens.length > 0 && displayMembers.length === 0 && members.length > 0;
+  const refineActive =
+    !!batch.trim() || !!country.trim() || !!city.trim() || !!profession.trim();
 
-  function clearRefine() {
-    setBatchFilter("");
-    setCountryFilter("");
-    setLocationFilter("");
+  function clearFilters() {
+    setBatch("");
+    setCountry("");
+    setCity("");
+    setProfession("");
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-b from-card to-card/80 shadow-md ring-1 ring-border/30 dark:from-card/90 dark:to-card/60 dark:ring-border/40">
-        <div className="border-b border-border/50 bg-muted/30 px-4 py-3 dark:bg-muted/20 sm:px-5">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            <Sparkles className="size-3.5 text-primary" aria-hidden />
-            Find members
-          </div>
+    <div className="space-y-5 sm:space-y-6">
+      <div className="flex flex-col gap-4 border-b border-border/50 pb-4 sm:pb-5 lg:pb-4">
+        <div className="min-w-0">
+          <h1 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">Members</h1>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            Search by name, profession, city, batch, or country—filters narrow results from the directory.
+            <span className="text-muted-foreground/80">
+              {" "}
+              · <span className="tabular-nums text-foreground/90">{totalCount.toLocaleString()}</span> verified
+              {members.length > 0 ? (
+                <>
+                  {" "}
+                  · <span className="tabular-nums text-foreground/90">{members.length}</span> shown
+                </>
+              ) : null}
+              {hasMore && members.length > 0 ? <span className="text-muted-foreground/70"> · scroll for more</span> : null}
+            </span>
+          </p>
         </div>
 
-        <div className="space-y-5 p-6 sm:p-7">
-          <div className="relative">
-            <Search
-              className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground/80"
-              aria-hidden
-            />
-            <Input
-              placeholder="Name, profession, company, or city…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="h-12 rounded-2xl border-border/70 bg-background/90 pl-12 pr-24 text-base shadow-inner dark:bg-background/50"
-              aria-label="Search members"
-            />
-            {search ? (
-              <button
+        <div className="relative w-full">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/75 sm:left-2.5 sm:size-3.5"
+            aria-hidden
+          />
+          <Input
+            placeholder="Name, profession, company…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-11 w-full rounded-xl border-border/60 bg-background/90 py-2 pl-10 pr-11 text-base shadow-sm transition-surface sm:h-9 sm:rounded-lg sm:pl-8 sm:pr-10 sm:text-sm dark:bg-background/50"
+            aria-label="Search members"
+          />
+          {search ? (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-2 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-surface hover:bg-muted hover:text-foreground sm:right-2.5 sm:size-7 sm:rounded-md"
+              aria-label="Clear search"
+            >
+              <X className="size-4 sm:size-3.5" />
+            </button>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2.5 sm:gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Filters</p>
+            {refineActive ? (
+              <Button
                 type="button"
-                onClick={() => setSearch("")}
-                className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                aria-label="Clear search"
+                variant="ghost"
+                size="sm"
+                className="hidden h-8 shrink-0 text-xs sm:inline-flex"
+                onClick={clearFilters}
               >
-                <X className="size-4" />
-              </button>
-            ) : null}
-            {loading && debouncedSearch.trim() ? (
-              <Loader2 className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 animate-spin text-primary sm:right-12" aria-hidden />
+                Clear filters
+              </Button>
             ) : null}
           </div>
-
-          <p className="text-[14px] leading-relaxed text-muted-foreground sm:text-left">
-            Server search uses name, profession, company, and city. Refine filters apply to members already loaded—scroll to
-            load more, then narrow by batch, country, or address.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => setRefineOpen((v) => !v)}
-            aria-expanded={refineOpen}
-            className="flex w-full items-center justify-center gap-3 rounded-2xl border border-dashed border-border/80 bg-muted/20 py-4 text-sm font-medium text-foreground transition hover:bg-muted/40 dark:border-border/60 dark:bg-muted/10 dark:hover:bg-muted/25"
-          >
-            <ChevronDown className={cn("size-4 transition-transform", refineOpen && "rotate-180")} aria-hidden />
-            {refineOpen ? "Hide refine filters" : "Refine loaded members"}
-            {refineActiveCount > 0 ? (
-              <span className="rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">{refineActiveCount}</span>
-            ) : null}
-          </button>
-
-          {refineOpen ? (
-            <div className="space-y-5 border-t border-border/50 pt-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-sm font-semibold text-foreground">Batch, country & location</span>
-                {refineActiveCount > 0 ? (
-                  <Button type="button" variant="ghost" size="sm" className="h-8 text-xs" onClick={clearRefine}>
-                    Clear all
-                  </Button>
-                ) : null}
-              </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div className="relative">
-                  <GraduationCap
-                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                    aria-hidden
-                  />
-                  <Input
-                    placeholder="Batch year"
-                    value={batchFilter}
-                    onChange={(e) => setBatchFilter(e.target.value)}
-                    className="h-11 rounded-xl border-border/70 bg-background/80 pl-10 dark:bg-background/50"
-                    aria-label="Filter by batch year"
-                  />
-                </div>
-                <div className="relative">
-                    <Globe
-                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                    aria-hidden
-                  />
-                  <Input
-                    placeholder="Country"
-                    value={countryFilter}
-                    onChange={(e) => setCountryFilter(e.target.value)}
-                    className="h-11 rounded-xl border-border/70 bg-background/80 pl-10 dark:bg-background/50"
-                    aria-label="Filter by country"
-                  />
-                </div>
-                <div className="relative">
-                  <MapPin
-                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                    aria-hidden
-                  />
-                  <Input
-                    placeholder="City or address keyword"
-                    value={locationFilter}
-                    onChange={(e) => setLocationFilter(e.target.value)}
-                    className="h-11 rounded-xl border-border/70 bg-background/80 pl-10 dark:bg-background/50"
-                    aria-label="Filter by city or address"
-                  />
-                </div>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+            <Input
+              placeholder="Batch"
+              value={batch}
+              onChange={(e) => setBatch(e.target.value)}
+              className="h-11 w-full rounded-xl border-border/60 bg-background/90 text-base transition-surface sm:h-9 sm:rounded-lg sm:text-sm dark:bg-background/50"
+              aria-label="Filter by batch"
+            />
+            <Input
+              placeholder="Country"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="h-11 w-full rounded-xl border-border/60 bg-background/90 text-base transition-surface sm:h-9 sm:rounded-lg sm:text-sm dark:bg-background/50"
+              aria-label="Filter by country"
+            />
+            <Input
+              placeholder="City"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="h-11 w-full rounded-xl border-border/60 bg-background/90 text-base transition-surface sm:h-9 sm:rounded-lg sm:text-sm dark:bg-background/50"
+              aria-label="Filter by current city"
+            />
+            <Input
+              placeholder="Profession"
+              value={profession}
+              onChange={(e) => setProfession(e.target.value)}
+              className="h-11 w-full rounded-xl border-border/60 bg-background/90 text-base transition-surface sm:h-9 sm:rounded-lg sm:text-sm dark:bg-background/50"
+              aria-label="Filter by profession"
+            />
+          </div>
+          {refineActive ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-10 w-full text-sm sm:hidden"
+              onClick={clearFilters}
+            >
+              Clear filters
+            </Button>
           ) : null}
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
-        <span>
-          Showing{" "}
-          <span className="font-semibold tabular-nums text-foreground">{displayMembers.length}</span>
-          {clientTokens.length > 0 ? (
-            <>
-              {" "}
-              filtered · <span className="tabular-nums text-foreground">{members.length}</span> loaded
-            </>
-          ) : (
-            <> members</>
-          )}
-        </span>
-        {hasMore ? <span className="text-xs">Scroll down for more</span> : null}
-      </div>
-
-      {showRefineHint ? (
-        <p className="rounded-2xl border border-amber-500/35 bg-amber-500/[0.09] px-4 py-3 text-sm text-amber-950 dark:border-amber-500/25 dark:bg-amber-950/30 dark:text-amber-50">
-          No loaded members match these filters. Scroll to load more profiles, or clear a refine field.
-        </p>
-      ) : null}
-
       <div className="grid grid-cols-1 gap-4 min-[400px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {displayMembers.map((m) => (
+        {members.map((m) => (
           <MemberCard
             key={m._id}
             userId={m._id}
@@ -265,13 +255,15 @@ export function MembersClient({ initialMembers }: { initialMembers: Member[] }) 
           />
         ))}
       </div>
-      {displayMembers.length === 0 && !loading && (
-        <div className="rounded-3xl border border-dashed border-border/80 bg-muted/20 py-16 text-center text-sm text-muted-foreground">
+
+      {members.length === 0 && !loading && (
+        <div className="rounded-2xl border border-dashed border-border/70 bg-muted/25 py-14 text-center text-sm text-muted-foreground sm:rounded-3xl">
           No members match your search or filters.
         </div>
       )}
-      <div ref={observerRef} className="mt-4 flex h-8 items-center justify-center">
-        {loading && <Loader2 className="size-5 animate-spin text-muted-foreground" aria-hidden />}
+
+      <div ref={observerRef} className="flex h-8 items-center justify-center">
+        {loading ? <Loader2 className="size-5 animate-spin text-muted-foreground" aria-hidden /> : null}
       </div>
     </div>
   );

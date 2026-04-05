@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
 import { ArrowRight, GraduationCap, Sparkles } from "lucide-react";
 import { NETWORK_NAME } from "@/lib/brand";
 
-export function HeroSection() {
+export function HeroSection({ className }: { className?: string }) {
   const { data: session, status } = useSession();
 
   return (
-    <section className="relative overflow-hidden py-20 md:py-28 lg:py-36">
+    <section className={cn("relative overflow-hidden py-20 md:py-28 lg:py-36", className)}>
       {/* Background gradients */}
       <div className="absolute inset-0 gradient-hero-bg" />
       <div className="absolute -top-40 -right-40 size-96 rounded-full bg-violet-500/15 blur-3xl dark:bg-violet-500/10" />
@@ -23,7 +23,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/80 px-4 py-1.5 text-sm font-medium text-foreground shadow-sm backdrop-blur-md dark:border-border/80 dark:bg-background/60"
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/90 px-4 py-1.5 text-sm font-medium text-foreground shadow-card backdrop-blur-md transition-surface dark:border-border/55 dark:bg-card/80"
         >
           <Sparkles className="size-4 shrink-0 text-violet-600 dark:text-violet-400" aria-hidden />
           <span>Nepal · Connect · Grow</span>
@@ -33,7 +33,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="mx-auto max-w-4xl leading-tight"
+          className="font-heading mx-auto max-w-4xl leading-tight"
         >
           {NETWORK_NAME}{" "}
           <span className="gradient-text">Network Awaits</span>

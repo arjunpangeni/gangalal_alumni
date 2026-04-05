@@ -2,7 +2,8 @@ import connectDB from "@/lib/db";
 import User from "@/lib/models/User";
 import { MembersClient } from "./MembersClient";
 import type { Metadata } from "next";
-import { PageShell, PageHeader } from "@/components/layout/Page";
+import { PageShell } from "@/components/layout/Page";
+import { PageListingShell } from "@/components/layout/PageListingShell";
 
 export const metadata: Metadata = { title: "Members" };
 export const dynamic = "force-dynamic";
@@ -11,7 +12,14 @@ interface UserDoc {
   _id: string;
   name: string;
   image?: string;
-  profile?: { profession?: string; company?: string; city?: string; batch?: string };
+  profile?: {
+    profession?: string;
+    company?: string;
+    city?: string;
+    country?: string;
+    batch?: string;
+    slcSeeBatch?: number;
+  };
 }
 
 export default async function MembersPage() {
@@ -32,17 +40,10 @@ export default async function MembersPage() {
   } catch { /* DB unavailable */ }
 
   return (
-    <PageShell className="max-w-6xl">
-      <PageHeader
-        title="Member directory"
-        description={
-          <>
-            <span className="text-foreground/90">{totalCount.toLocaleString()} verified members.</span> Search the network by
-            name and role, then refine by batch, country, or location on the results you have loaded.
-          </>
-        }
-      />
-      <MembersClient initialMembers={initialMembers} />
-    </PageShell>
+    <PageListingShell>
+      <PageShell className="max-w-6xl">
+        <MembersClient initialMembers={initialMembers} totalCount={totalCount} />
+      </PageShell>
+    </PageListingShell>
   );
 }

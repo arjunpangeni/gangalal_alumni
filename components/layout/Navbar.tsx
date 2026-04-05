@@ -48,7 +48,7 @@ export function Navbar() {
     );
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/85 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 dark:border-border/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/90 shadow-[0_1px_3px_oklch(0.35_0.08_264/0.06)] backdrop-blur-xl transition-surface supports-[backdrop-filter]:bg-background/75 dark:border-border/50">
       <div className="container mx-auto flex h-14 items-center justify-between gap-2 px-4 sm:h-16">
         {/* Logo */}
         <Link href="/" className="flex min-w-0 items-center gap-2 rounded-lg py-1 font-bold text-base transition-opacity hover:opacity-90 sm:text-lg">

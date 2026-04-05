@@ -6,6 +6,7 @@ export function memberSearchHaystack(m: {
     company?: string;
     city?: string;
     country?: string;
+    batch?: string;
     permanentAddress?: string;
     schoolPeriod?: string;
     bio?: string;
@@ -19,6 +20,7 @@ export function memberSearchHaystack(m: {
     p.company,
     p.city,
     p.country,
+    p.batch,
     p.permanentAddress,
     p.schoolPeriod,
     p.bio,

@@ -24,7 +24,7 @@ export function ArticleCard({ title, slug, excerpt, coverImage, tags, readTime, 
     : null;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-sm ring-1 ring-border/10 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-2xl hover:ring-primary/20 hover:bg-card dark:bg-card/90 dark:border-border/30 dark:ring-border/5">
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/95 shadow-card ring-1 ring-primary/[0.05] transition-surface hover:-translate-y-1 hover:border-primary/35 hover:shadow-[0_14px_40px_oklch(0.35_0.1_264/0.14)] dark:border-border/45 dark:bg-card/90 sm:rounded-3xl">
       {imgUrl && (
         <Link href={`/articles/${slug}`} className="overflow-hidden">
           <Image
@@ -46,7 +46,7 @@ export function ArticleCard({ title, slug, excerpt, coverImage, tags, readTime, 
             ))}
           </div>
         )}
-        <h3 className="mb-3 text-lg font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
+        <h3 className="font-heading mb-3 text-lg font-bold leading-tight transition-surface group-hover:text-primary line-clamp-2">
           <Link href={`/articles/${slug}`}>{title}</Link>
         </h3>
         {excerpt && (

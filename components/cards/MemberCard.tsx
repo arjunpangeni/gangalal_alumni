@@ -35,7 +35,7 @@ export function MemberCard({
             <AvatarFallback className="text-lg font-bold sm:text-xl">{name.charAt(0)}</AvatarFallback>
           </Avatar>
         </div>
-        <h3 className="mb-2 line-clamp-2 text-base font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+        <h3 className="font-heading mb-2 line-clamp-2 text-base font-bold leading-tight text-foreground transition-surface group-hover:text-primary">
           {name}
         </h3>
         {profession ? <p className="mb-3 line-clamp-2 text-sm leading-snug text-muted-foreground font-medium">{profession}</p> : null}
