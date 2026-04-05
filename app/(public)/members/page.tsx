@@ -4,9 +4,8 @@ import { MembersClient } from "./MembersClient";
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/Page";
 import { PageListingShell } from "@/components/layout/PageListingShell";
-
 export const metadata: Metadata = { title: "Members" };
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 interface UserDoc {
   _id: string;

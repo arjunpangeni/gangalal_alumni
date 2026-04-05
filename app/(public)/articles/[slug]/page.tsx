@@ -11,8 +11,7 @@ import { estimateArticleReadMinutes } from "@/lib/article-read-time";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
-
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 interface ArticleDoc {
   _id: string;

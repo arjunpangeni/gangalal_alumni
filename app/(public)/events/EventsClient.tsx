@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { EventCard } from "@/components/cards/EventCard";
 import { Input } from "@/components/ui/input";
 import { Search, Loader2, X, Calendar } from "lucide-react";
@@ -18,11 +18,12 @@ interface EventDoc {
   tags?: string[];
 }
 
-export function EventsClient() {
-  const [events, setEvents] = useState<EventDoc[]>([]);
+export function EventsClient({ initialEvents }: { initialEvents: unknown[] }) {
+  const [events, setEvents] = useState<EventDoc[]>(initialEvents as EventDoc[]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const debouncedSearch = useDebounce(search, 300);
+  const hasHydratedRef = useRef(false);
 
   const fetchEvents = useCallback(async (q: string) => {
     setLoading(true);
@@ -40,8 +41,12 @@ export function EventsClient() {
   }, []);
 
   useEffect(() => {
-    fetchEvents(debouncedSearch);
-  }, [debouncedSearch, fetchEvents]);
+    if (!hasHydratedRef.current) {
+      hasHydratedRef.current = true;
+      if (!debouncedSearch.trim() && initialEvents.length > 0) return;
+    }
+    void fetchEvents(debouncedSearch);
+  }, [debouncedSearch, fetchEvents, initialEvents.length]);
 
   const { upcoming, past } = useMemo(() => {
     const now = new Date();

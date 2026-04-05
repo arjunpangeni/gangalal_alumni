@@ -4,6 +4,7 @@ import { badRequest, serverError, tooManyRequests } from "@/lib/errors";
 import { createJobSchema } from "@/lib/validations/job";
 import connectDB from "@/lib/db";
 import Job from "@/lib/models/Job";
+import { getJobsListing } from "@/lib/server/public-listings";
 import { sanitizeInput, checkCorsOrigin } from "@/lib/utils";
 import { applyRateLimit, writeLimiter } from "@/lib/ratelimit";
 import { ingestJob } from "@/lib/rag";
@@ -12,35 +13,15 @@ import slugify from "slugify";
 export async function GET(req: NextRequest) {
   if (!checkCorsOrigin(req)) return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   try {
-    await connectDB();
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20"));
     const type = searchParams.get("type");
-    const q = searchParams.get("q")?.trim();
-    const filter: Record<string, unknown> = { status: "published", deletedAt: null };
-    if (type) filter.type = type;
-    if (q) {
-      filter.$or = [
-        { title: { $regex: q, $options: "i" } },
-        { company: { $regex: q, $options: "i" } },
-        { location: { $regex: q, $options: "i" } },
-        { description: { $regex: q, $options: "i" } },
-        { tags: { $in: [new RegExp(q, "i")] } },
-      ];
-    }
+    const q = searchParams.get("q");
 
-    const [jobs, total] = await Promise.all([
-      Job.find(filter)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .select("title slug company location type salary applyUrl applyEmail applyPhone tags educationOrSkills expiresAt")
-        .lean(),
-      Job.countDocuments(filter),
-    ]);
+    const { jobs, meta } = await getJobsListing({ page, limit, type, q });
 
-    return NextResponse.json({ success: true, data: jobs, meta: { page, limit, total } });
+    return NextResponse.json({ success: true, data: jobs, meta });
   } catch {
     return serverError();
   }

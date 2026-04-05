@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { Input } from "@/components/ui/input";
 import { Search, Loader2, X } from "lucide-react";
@@ -20,11 +20,12 @@ interface Article {
   authorId?: { name: string; image?: string };
 }
 
-export function ArticlesClient() {
-  const [articles, setArticles] = useState<Article[]>([]);
+export function ArticlesClient({ initialArticles }: { initialArticles: unknown[] }) {
+  const [articles, setArticles] = useState<Article[]>(initialArticles as Article[]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const debouncedSearch = useDebounce(search, 300);
+  const hasHydratedRef = useRef(false);
 
   const fetchArticles = useCallback(async (q: string) => {
     setLoading(true);
@@ -42,8 +43,12 @@ export function ArticlesClient() {
   }, []);
 
   useEffect(() => {
-    fetchArticles(debouncedSearch);
-  }, [debouncedSearch, fetchArticles]);
+    if (!hasHydratedRef.current) {
+      hasHydratedRef.current = true;
+      if (!debouncedSearch.trim() && initialArticles.length > 0) return;
+    }
+    void fetchArticles(debouncedSearch);
+  }, [debouncedSearch, fetchArticles, initialArticles.length]);
 
   return (
     <div className="space-y-5 sm:space-y-6">

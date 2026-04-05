@@ -14,8 +14,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
-
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 interface ArticleDoc {
   _id: string;

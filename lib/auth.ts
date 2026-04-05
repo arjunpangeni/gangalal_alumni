@@ -30,10 +30,12 @@ function getClientPromise(): Promise<MongoClient> {
 }
 
 export const authConfig: NextAuthConfig = {
-  // Auth.js rejects requests when the forwarded Host is not trusted (UntrustedHost).
-  // Vercel terminates TLS and sets x-forwarded-* — VERCEL=1 in all deployments.
-  // See https://errors.authjs.dev#untrustedhost
-  trustHost: process.env.VERCEL === "1" || process.env.NODE_ENV !== "production",
+  // Required for Google OAuth: Auth.js validates the request URL against the Host header.
+  // Do not gate this on process.env.* — Next.js inlines env at build time, so values added
+  // to .env.local after `next build` (e.g. AUTH_TRUST_HOST) stay false in the bundle and
+  // cause UntrustedHost on `next start`. Vercel sets x-forwarded-host correctly; keep
+  // NEXTAUTH_URL / AUTH_URL accurate for your deployment. See https://errors.authjs.dev#untrustedhost
+  trustHost: true,
   adapter: MongoDBAdapter(getClientPromise()),
   providers: [
     Google({

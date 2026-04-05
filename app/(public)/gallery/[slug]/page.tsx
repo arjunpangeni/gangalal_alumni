@@ -3,8 +3,7 @@ import connectDB from "@/lib/db";
 import Album from "@/lib/models/Album";
 import { GalleryAlbumExperience, type GalleryPhoto } from "@/components/gallery/GalleryAlbumExperience";
 import type { Metadata } from "next";
-
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;

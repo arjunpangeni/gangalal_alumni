@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "Mentorship",
   description: "Connect with alumni mentors by email.",
 };
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 interface UserDoc {
   _id: string;

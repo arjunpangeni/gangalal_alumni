@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -21,16 +21,17 @@ interface Job {
   applyEmail?: string;
   applyPhone?: string;
   tags?: string[];
-  description: string;
+  description?: string;
   educationOrSkills?: string;
   expiresAt?: string;
 }
 
-export function JobsClient() {
-  const [jobs, setJobs] = useState<Job[]>([]);
+export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
+  const [jobs, setJobs] = useState<Job[]>(initialJobs as Job[]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const debouncedSearch = useDebounce(search, 300);
+  const hasHydratedRef = useRef(false);
 
   const fetchJobs = useCallback(async (q: string) => {
     setLoading(true);
@@ -48,8 +49,12 @@ export function JobsClient() {
   }, []);
 
   useEffect(() => {
-    fetchJobs(debouncedSearch);
-  }, [debouncedSearch, fetchJobs]);
+    if (!hasHydratedRef.current) {
+      hasHydratedRef.current = true;
+      if (!debouncedSearch.trim() && initialJobs.length > 0) return;
+    }
+    void fetchJobs(debouncedSearch);
+  }, [debouncedSearch, fetchJobs, initialJobs.length]);
 
   return (
     <div className="space-y-5 sm:space-y-6">
@@ -137,7 +142,7 @@ export function JobsClient() {
                   <span>{job.educationOrSkills}</span>
                 </p>
               ) : null}
-              <p className="text-sm text-foreground/90 leading-relaxed line-clamp-4 whitespace-pre-wrap">{job.description}</p>
+              <p className="text-sm text-foreground/90 leading-relaxed line-clamp-4 whitespace-pre-wrap">{job.description ?? ""}</p>
             </div>
             <div className="flex flex-col gap-3 shrink-0 w-full sm:w-auto sm:min-w-[12rem]">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center sm:text-left">Apply</p>

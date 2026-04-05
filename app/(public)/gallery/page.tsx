@@ -4,9 +4,8 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/Page";
 import { PageListingShell } from "@/components/layout/PageListingShell";
 import { GalleryClient, type GalleryAlbum } from "./GalleryClient";
-
 export const metadata: Metadata = { title: "Gallery" };
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function GalleryPage() {
   let albums: GalleryAlbum[] = [];
