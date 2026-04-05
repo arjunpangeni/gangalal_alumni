@@ -9,6 +9,7 @@ import { formatDate, cn } from "@/lib/utils";
 import { Briefcase, Pencil, Plus, MapPin, Calendar } from "lucide-react";
 import { redirect } from "next/navigation";
 import { PageShell, PageHeader, PageEmptyState } from "@/components/layout/Page";
+import { MyJobDeleteButton } from "./MyJobDeleteButton";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -124,7 +125,7 @@ export default async function MyJobsPage() {
                       ) : null}
                     </div>
                   </CardHeader>
-                  <CardFooter className="flex flex-col justify-center border-0 bg-muted/40 p-4 sm:w-[min(100%,11rem)] sm:shrink-0 sm:border-l sm:border-border/50 sm:bg-muted/25 sm:p-5">
+                  <CardFooter className="flex flex-col justify-center gap-2 border-0 bg-muted/40 p-4 sm:w-[min(100%,11rem)] sm:shrink-0 sm:border-l sm:border-border/50 sm:bg-muted/25 sm:p-5">
                     <Link
                       href={`/dashboard/jobs/edit/${j.slug}`}
                       className={`${buttonVariants({ variant: "outline" })} min-h-11 w-full gap-2 justify-center sm:min-h-10`}
@@ -132,6 +133,7 @@ export default async function MyJobsPage() {
                       <Pencil className="size-4 shrink-0" />
                       Edit
                     </Link>
+                    <MyJobDeleteButton slug={j.slug} title={j.title} />
                   </CardFooter>
                 </div>
               </Card>
