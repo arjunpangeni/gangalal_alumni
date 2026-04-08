@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, BookOpen, Briefcase, Calendar, Images, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/components/i18n/I18nProvider";
@@ -16,6 +16,7 @@ const tiles = [
 
 export function HomeExploreTiles() {
   const { messages } = useI18n();
+  const reduceMotion = useReducedMotion();
   const text = (id: string, fallback: string) => {
     const resolved = id.split(".").reduce<unknown>((acc, part) => {
       if (typeof acc === "object" && acc !== null && part in (acc as Record<string, unknown>)) {
@@ -36,18 +37,22 @@ export function HomeExploreTiles() {
         className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-3.5 lg:grid-cols-5"
         initial="hidden"
         whileInView="show"
-        viewport={{ once: true, margin: "-32px" }}
+        viewport={{ once: true, margin: "-15%" }}
         variants={{
           hidden: {},
-          show: { transition: { staggerChildren: 0.06 } },
+          show: { transition: { staggerChildren: reduceMotion ? 0 : 0.04 } },
         }}
       >
         {tiles.map(({ href, labelId, subId, icon: Icon }) => (
           <motion.li
             key={href}
             variants={{
-              hidden: { opacity: 0, y: 12 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
+              hidden: reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 },
+              show: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: reduceMotion ? 0 : 0.32, ease: [0.22, 1, 0.36, 1] },
+              },
             }}
           >
             <Link

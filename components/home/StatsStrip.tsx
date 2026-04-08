@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { cn } from "@/lib/utils";
 
@@ -12,29 +12,48 @@ interface Stat {
   suffix?: string;
 }
 
-function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
+function Counter({ value, suffix = "", skipAnimation }: { value: number; suffix?: string; skipAnimation: boolean }) {
+  const [count, setCount] = useState(skipAnimation ? value : 0);
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
+  const inView = useInView(ref, { once: true, margin: "-10%" });
 
   useEffect(() => {
+    if (skipAnimation) {
+      setCount(value);
+      return;
+    }
     if (!inView) return;
-    let start = 0;
-    const duration = 1500;
-    const step = Math.ceil(value / (duration / 16));
-    const timer = setInterval(() => {
-      start = Math.min(start + step, value);
-      setCount(start);
-      if (start >= value) clearInterval(timer);
-    }, 16);
-    return () => clearInterval(timer);
-  }, [inView, value]);
+    let raf = 0;
+    let lastShown = -1;
+    const start = performance.now();
+    const duration = 900;
 
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - (1 - t) ** 2;
+      const next = Math.round(eased * value);
+      if (next !== lastShown) {
+        lastShown = next;
+        setCount(next);
+      }
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, value, skipAnimation]);
+
+  return (
+    <span ref={ref}>
+      {count.toLocaleString()}
+      {suffix}
+    </span>
+  );
 }
 
 export function StatsStrip({ stats, bare, className }: { stats: Stat[]; bare?: boolean; className?: string }) {
   const { messages } = useI18n();
+  const reduceMotion = useReducedMotion();
+
   const getLabel = (stat: Stat) => {
     if (!stat.labelId) return stat.label;
     const resolved = stat.labelId.split(".").reduce<unknown>((acc, part) => {
@@ -51,14 +70,14 @@ export function StatsStrip({ stats, bare, className }: { stats: Stat[]; bare?: b
       {stats.map((stat, i) => (
         <motion.div
           key={stat.labelId ?? `${stat.label}-${i}`}
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: i * 0.1 }}
+          viewport={{ once: true, margin: "-10%" }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.35, delay: i * 0.05 }}
           className="rounded-xl border border-border/55 bg-card/95 px-3 py-4 text-center shadow-sm ring-1 ring-primary/[0.05] transition-surface dark:border-border/50 dark:bg-card/85 sm:px-5 sm:py-5"
         >
-          <p className="text-2xl font-bold tabular-nums gradient-text sm:text-[1.75rem] md:text-[2rem]">
-            <Counter value={stat.value} suffix={stat.suffix} />
+          <p className="text-2xl font-bold tabular-nums gradient-text-static sm:text-[1.75rem] md:text-[2rem]">
+            <Counter value={stat.value} suffix={stat.suffix} skipAnimation={!!reduceMotion} />
           </p>
           <p className="mt-2 text-[13px] font-medium leading-snug text-muted-foreground sm:text-sm">{getLabel(stat)}</p>
         </motion.div>

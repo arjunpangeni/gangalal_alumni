@@ -133,6 +133,16 @@ body {
   50% { background-position: 100% 50%; }
 }
 
+/* Same look as .gradient-text without continuous repaints (better scroll performance) */
+.gradient-text-static {
+  background: linear-gradient(135deg, oklch(0.6 0.2 250), oklch(0.55 0.25 290), oklch(0.65 0.22 220));
+  background-size: 100% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 /* Homepage notices: shifting gradient frame + soft glow */
 @keyframes home-notice-aurora {
   0%, 100% { background-position: 0% 50%; }

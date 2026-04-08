@@ -54,7 +54,7 @@ interface UserDoc {
 }
 
 const panel =
-  "rounded-xl border border-border/50 bg-card/80 shadow-sm ring-1 ring-primary/[0.02] backdrop-blur-[2px] dark:border-border/45 dark:bg-card/50 sm:rounded-2xl";
+  "rounded-xl border border-border/50 bg-card/90 shadow-sm ring-1 ring-primary/[0.02] dark:border-border/45 dark:bg-card/60 sm:rounded-2xl";
 
 function SectionTitle({
   title,

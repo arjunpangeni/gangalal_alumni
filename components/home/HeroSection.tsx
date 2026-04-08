@@ -63,7 +63,7 @@ export function HeroSection({ className }: { className?: string }) {
           <div className="mx-auto max-w-2xl text-center md:mx-0 md:max-w-[34rem] md:text-left">
             <motion.div
               variants={itemMotion}
-              className="mb-5 inline-flex items-center gap-2 rounded-md border border-border/60 bg-background/70 px-3 py-1.5 text-[13px] font-semibold leading-snug text-foreground shadow-sm backdrop-blur-md sm:mb-6 sm:px-3.5 sm:py-2 sm:text-sm dark:border-white/12 dark:bg-background/55"
+              className="mb-5 inline-flex items-center gap-2 rounded-md border border-border/60 bg-background/88 px-3 py-1.5 text-[13px] font-semibold leading-snug text-foreground shadow-sm sm:mb-6 sm:px-3.5 sm:py-2 sm:text-sm dark:border-white/12 dark:bg-background/75"
             >
               <Sparkles className="size-3.5 shrink-0 text-primary sm:size-4" aria-hidden />
               <span>{messages.home.heroBadge}</span>
@@ -111,7 +111,7 @@ export function HeroSection({ className }: { className?: string }) {
                 href="/members"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "h-12 w-full justify-center gap-2 rounded-xl border-border/70 bg-background/70 text-base backdrop-blur-sm sm:w-auto sm:min-w-[11rem] dark:bg-background/50"
+                  "h-12 w-full justify-center gap-2 rounded-xl border-border/70 bg-background/90 text-base sm:w-auto sm:min-w-[11rem] dark:bg-background/80"
                 )}
               >
                 {messages.home.browseMembers} <ArrowRight className="size-4" aria-hidden />
