@@ -13,6 +13,7 @@ import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 import { UploadProgressBar } from "@/components/ui/UploadProgressBar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export interface AdminAlbumRow {
   _id: string;
@@ -24,6 +25,7 @@ export interface AdminAlbumRow {
 }
 
 export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbumRow[] }) {
+  const { messages } = useI18n();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
@@ -45,12 +47,12 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
     e.preventDefault();
     const files = newAlbumFilesRef.current?.files;
     if (!files?.length) {
-      toast.error("Choose at least one photo to create the album in one step.");
+      toast.error(messages.adminClients.chooseOnePhoto);
       return;
     }
     const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
     if (!imageFiles.length) {
-      toast.error("Only image files are allowed.");
+      toast.error(messages.adminClients.onlyImagesAllowed);
       return;
     }
 
@@ -71,7 +73,7 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
         error?: string;
       };
       if (!createJson.success || !createJson.data?.id) {
-        toast.error(createJson.error ?? "Could not create album.");
+        toast.error(createJson.error ?? messages.adminClients.couldNotCreateAlbum);
         return;
       }
 
@@ -90,9 +92,9 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
       });
       const photosJson = await photosRes.json();
       if (!photosJson.success) {
-        toast.error(photosJson.error ?? "Album created but saving photos failed. Add them from the list below.");
+        toast.error(photosJson.error ?? messages.adminClients.albumCreatedButSaveFailed);
       } else {
-        toast.success(`Album created with ${photos.length} photo(s).`);
+        toast.success(`${messages.adminClients.albumCreatedWith} ${photos.length} ${messages.adminClients.photosCount}`);
         setTitle("");
         setDescription("");
         if (newAlbumFilesRef.current) newAlbumFilesRef.current.value = "";
@@ -100,7 +102,7 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
       setCreateProgress(100);
       router.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      toast.error(err instanceof Error ? err.message : messages.dashboard.somethingWentWrong);
     } finally {
       setBusy(false);
       setTimeout(() => setCreateProgress(null), 600);
@@ -111,7 +113,7 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
     if (!files?.length) return;
     const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
     if (!imageFiles.length) {
-      toast.error("No images selected.");
+      toast.error(messages.adminClients.noImagesSelected);
       return;
     }
 
@@ -130,14 +132,14 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
       });
       const json = await res.json();
       if (json.success) {
-        toast.success(`Added ${photos.length} photo(s).`);
+        toast.success(`${messages.adminClients.added} ${photos.length} ${messages.adminClients.photosCount}`);
         router.refresh();
       } else {
-        toast.error(json.error ?? "Failed.");
+        toast.error(json.error ?? messages.adminClients.failed);
       }
       setAlbumProgress(100);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed.");
+      toast.error(err instanceof Error ? err.message : messages.adminClients.uploadFailed);
     } finally {
       setUploadingId(null);
       setTimeout(() => setAlbumProgress(null), 400);
@@ -147,20 +149,20 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
   return (
     <div className="space-y-10 max-w-3xl">
       <form onSubmit={(e) => void createAlbumAndUpload(e)} className="rounded-xl border p-4 sm:p-6 space-y-4 bg-card">
-        <h2 className="font-semibold text-lg">New album &amp; photos</h2>
+        <h2 className="font-semibold text-lg">{messages.adminClients.newAlbumPhotos}</h2>
         <p className="text-sm text-muted-foreground">
-          Enter details, select one or more images, then submit once. The album is created and all photos are uploaded together.
+          {messages.adminClients.newAlbumDesc}
         </p>
         <div className="space-y-2">
-          <Label htmlFor="album-title">Title</Label>
+          <Label htmlFor="album-title">{messages.adminPages.tableTitle}</Label>
           <Input id="album-title" value={title} onChange={(e) => setTitle(e.target.value)} required minLength={2} disabled={busy} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="album-desc">Description (optional)</Label>
+          <Label htmlFor="album-desc">{messages.adminClients.descriptionOptional}</Label>
           <Textarea id="album-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} disabled={busy} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="album-photos">Photos (required)</Label>
+          <Label htmlFor="album-photos">{messages.adminClients.photosRequired}</Label>
           <Input
             ref={newAlbumFilesRef}
             id="album-photos"
@@ -172,20 +174,20 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
           />
         </div>
         {busy && createProgress !== null ? (
-          <UploadProgressBar value={createProgress} label="Creating album and uploading to Cloudinary…" />
+          <UploadProgressBar value={createProgress} label={messages.adminClients.creatingAlbumUploading} />
         ) : null}
         <Button type="submit" disabled={busy} className="gradient-primary text-white border-0">
           {busy ? <Loader2 className="size-4 animate-spin" /> : null}
-          Create album &amp; upload photos
+          {messages.adminClients.createAlbumUpload}
         </Button>
       </form>
 
       <div>
-        <h2 className="font-semibold text-lg mb-3">Albums</h2>
-        <p className="text-sm text-muted-foreground mb-4">Add more photos to an existing album anytime.</p>
+        <h2 className="font-semibold text-lg mb-3">{messages.adminClients.albums}</h2>
+        <p className="text-sm text-muted-foreground mb-4">{messages.adminClients.addMorePhotosAnytime}</p>
         <ul className="space-y-4">
           {initialAlbums.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No albums yet. Create one with the form above.</p>
+            <p className="text-muted-foreground text-sm">{messages.adminClients.noAlbumsYet}</p>
           ) : (
             initialAlbums.map((a) => (
               <li key={a._id} className="rounded-lg border p-4 space-y-3">
@@ -220,7 +222,7 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
                       ) : (
                         <ImagePlus className="size-4" />
                       )}
-                      Upload more photos
+                      {messages.adminClients.uploadMorePhotos}
                     </label>
                     <Button
                       type="button"
@@ -235,7 +237,7 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
                       ) : (
                         <Trash2 className="size-4" />
                       )}
-                      Delete album
+                      {messages.adminClients.deleteAlbum}
                     </Button>
                   </div>
                 </div>
@@ -250,7 +252,7 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
                             <img src={ph.url} alt="" className="size-full object-cover" />
                             <button
                               type="button"
-                              title="Delete photo"
+                              title={messages.adminClients.deletePhoto}
                               disabled={busyPhoto || uploadingId === a._id}
                               className="absolute right-1 top-1 flex size-8 items-center justify-center rounded-md bg-destructive/90 text-destructive-foreground shadow-sm hover:bg-destructive disabled:opacity-50"
                               onClick={() => setPhotoDeleteTarget({ albumId: a._id, publicId: ph.publicId })}
@@ -264,7 +266,7 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
                   </div>
                 ) : null}
                 {uploadingId === a._id && albumProgress !== null ? (
-                  <UploadProgressBar value={albumProgress} label="Uploading…" />
+                  <UploadProgressBar value={albumProgress} label={messages.dashboard.uploading} />
                 ) : null}
               </li>
             ))
@@ -277,7 +279,7 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
         onOpenChange={(open) => {
           if (!open) setAlbumDeleteTarget(null);
         }}
-        title="Delete this album?"
+        title={messages.adminClients.deleteThisAlbum}
         description={
           albumDeleteTarget ? (
             <>
@@ -286,8 +288,8 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
             </>
           ) : null
         }
-        confirmLabel="Delete album"
-        cancelLabel="Cancel"
+        confirmLabel={messages.adminClients.deleteAlbum}
+        cancelLabel={messages.dashboard.cancel}
         variant="destructive"
         pending={albumDeleteTarget !== null && deletingAlbumId === albumDeleteTarget.id}
         onConfirm={async () => {
@@ -298,14 +300,14 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
             const res = await fetch(`/api/gallery/${albumId}`, { method: "DELETE" });
             const json = (await res.json()) as { success?: boolean; error?: string };
             if (!json.success) {
-              toast.error(json.error ?? "Could not delete album.");
+              toast.error(json.error ?? messages.adminClients.couldNotDeleteAlbum);
               throw new Error("api");
             }
-            toast.success("Album deleted.");
+            toast.success(messages.adminClients.albumDeleted);
             router.refresh();
           } catch (e) {
             if (e instanceof Error && e.message === "api") throw e;
-            toast.error("Delete failed.");
+            toast.error(messages.adminClients.deleteFailed);
             throw e;
           } finally {
             setDeletingAlbumId(null);
@@ -318,10 +320,10 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
         onOpenChange={(open) => {
           if (!open) setPhotoDeleteTarget(null);
         }}
-        title="Remove this photo?"
-        description="It will be removed from the album and deleted from storage."
-        confirmLabel="Remove"
-        cancelLabel="Cancel"
+        title={messages.adminClients.removeThisPhoto}
+        description={messages.adminClients.removePhotoDesc}
+        confirmLabel={messages.adminClients.remove}
+        cancelLabel={messages.dashboard.cancel}
         variant="destructive"
         pending={
           photoDeleteTarget !== null &&
@@ -340,14 +342,14 @@ export function AdminGalleryClient({ initialAlbums }: { initialAlbums: AdminAlbu
             });
             const json = (await res.json()) as { success?: boolean; error?: string };
             if (!json.success) {
-              toast.error(json.error ?? "Could not delete photo.");
+              toast.error(json.error ?? messages.adminClients.couldNotDeletePhoto);
               throw new Error("api");
             }
-            toast.success("Photo removed.");
+            toast.success(messages.adminClients.photoRemoved);
             router.refresh();
           } catch (e) {
             if (e instanceof Error && e.message === "api") throw e;
-            toast.error("Delete failed.");
+            toast.error(messages.adminClients.deleteFailed);
             throw e;
           } finally {
             setDeletingPhotoKey(null);

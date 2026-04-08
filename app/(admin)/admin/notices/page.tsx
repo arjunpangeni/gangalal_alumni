@@ -2,6 +2,7 @@ import connectDB from "@/lib/db";
 import Notice from "@/lib/models/Notice";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { AdminNoticesClient, type AdminNoticeRow } from "./AdminNoticesClient";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -27,13 +28,8 @@ export default async function AdminNoticesPage() {
   return (
     <PageShell className="max-w-4xl px-0 space-y-6">
       <PageHeader
-        title="Notices"
-        description={
-          <>
-            Short announcements shown on the <strong className="text-foreground font-medium">homepage</strong> directly under the hero (active
-            items only). Higher sort order appears first.
-          </>
-        }
+        title={<I18nText id="adminPages.noticesTitle" fallback="Notices" />}
+        description={<I18nText id="adminPages.noticesDesc" fallback="Short announcements shown on the homepage under the hero. Higher sort order appears first." />}
       />
       <AdminNoticesClient initial={initial} />
     </PageShell>

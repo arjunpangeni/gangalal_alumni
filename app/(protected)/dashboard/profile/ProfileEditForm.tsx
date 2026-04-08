@@ -14,6 +14,7 @@ import { Camera, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { postFormDataWithUploadProgress } from "@/lib/form-upload-progress";
 import { UploadProgressBar } from "@/components/ui/UploadProgressBar";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 interface Props {
   currentProfile: Record<string, string | number | undefined>;
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export function ProfileEditForm({ currentProfile, userName, userImage, onSaved }: Props) {
+  const { messages } = useI18n();
   const { update } = useSession();
   const [submitting, setSubmitting] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -67,13 +69,13 @@ export function ProfileEditForm({ currentProfile, userName, userImage, onSaved }
       const json = (await res.json()) as { success?: boolean; error?: string; url?: string };
       if (res.ok && json.success) {
         setPhotoUrl(json.url ?? "");
-        toast.success("Profile photo updated.");
+        toast.success(messages.dashboard.profilePhotoUpdated);
         await update();
       } else {
-        toast.error(json.error ?? "Failed to upload photo.");
+        toast.error(json.error ?? messages.dashboard.failedUploadPhoto);
       }
     } catch {
-      toast.error("Something went wrong uploading photo.");
+      toast.error(messages.dashboard.uploadPhotoError);
     } finally {
       setUploadingPhoto(false);
       setPhotoProgress(null);
@@ -93,13 +95,13 @@ export function ProfileEditForm({ currentProfile, userName, userImage, onSaved }
       const json = await res.json();
       if (json.success) {
         await update();
-        toast.success("Profile saved.");
+        toast.success(messages.dashboard.profileSaved);
         onSaved?.();
       } else {
-        toast.error(json.error ?? "Failed to update profile.");
+        toast.error(json.error ?? messages.dashboard.failedUpdateProfile);
       }
     } catch {
-      toast.error("Something went wrong.");
+      toast.error(messages.dashboard.somethingWentWrong);
     } finally {
       setSubmitting(false);
     }
@@ -109,7 +111,7 @@ export function ProfileEditForm({ currentProfile, userName, userImage, onSaved }
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 rounded-xl border bg-card p-4 sm:p-6 w-full">
 
       <div className="space-y-2">
-        <Label>Profile Photo</Label>
+        <Label>{messages.dashboard.profilePhoto}</Label>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="relative group shrink-0">
             <Avatar className="size-20 ring-2 ring-border">
@@ -130,9 +132,9 @@ export function ProfileEditForm({ currentProfile, userName, userImage, onSaved }
           </div>
           <div>
             <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploadingPhoto}>
-              {uploadingPhoto ? "Uploading..." : "Change Photo"}
+              {uploadingPhoto ? messages.dashboard.uploading : messages.dashboard.changePhoto}
             </Button>
-            <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, WebP · Max 5MB</p>
+            <p className="text-xs text-muted-foreground mt-1">{messages.dashboard.photoHint}</p>
           </div>
           <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handlePhotoChange} />
         </div>
@@ -140,93 +142,93 @@ export function ProfileEditForm({ currentProfile, userName, userImage, onSaved }
           <UploadProgressBar
             indeterminate={photoIndeterminate}
             value={photoIndeterminate ? undefined : (photoProgress ?? 0)}
-            label="Uploading profile photo…"
+            label={messages.dashboard.uploadingProfilePhoto}
             className="max-w-md"
           />
         ) : null}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="name">Display name <span className="text-destructive">*</span></Label>
-        <Input id="name" placeholder="Your full name" {...register("name")} />
+        <Label htmlFor="name">{messages.dashboard.displayName} <span className="text-destructive">*</span></Label>
+        <Input id="name" placeholder={messages.dashboard.fullNamePlaceholder} {...register("name")} />
         {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
         <p className="text-xs text-muted-foreground">
-          Shown across the site instead of your Google account name when saved.
+          {messages.dashboard.displayNameHelp}
         </p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="bio">Bio <span className="text-destructive">*</span></Label>
-        <Textarea id="bio" rows={3} placeholder="Tell us about yourself..." {...register("bio")} />
+        <Label htmlFor="bio">{messages.dashboard.bioLabel} <span className="text-destructive">*</span></Label>
+        <Textarea id="bio" rows={3} placeholder={messages.dashboard.bioPlaceholder} {...register("bio")} />
         {errors.bio && <p className="text-xs text-destructive">{errors.bio.message}</p>}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="slcSeeBatch">SLC / SEE Batch Year</Label>
-          <Input id="slcSeeBatch" type="number" placeholder="e.g. 2015" {...register("slcSeeBatch", { valueAsNumber: true })} />
+          <Label htmlFor="slcSeeBatch">{messages.dashboard.slcBatchYear}</Label>
+          <Input id="slcSeeBatch" type="number" placeholder={messages.dashboard.slcBatchPlaceholder} {...register("slcSeeBatch", { valueAsNumber: true })} />
           {errors.slcSeeBatch && <p className="text-xs text-destructive">{errors.slcSeeBatch.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="schoolPeriod">Years Studied at School</Label>
-          <Input id="schoolPeriod" placeholder="e.g. 2008–2015" {...register("schoolPeriod")} />
+          <Label htmlFor="schoolPeriod">{messages.dashboard.schoolYears}</Label>
+          <Input id="schoolPeriod" placeholder={messages.dashboard.schoolYearsPlaceholder} {...register("schoolPeriod")} />
           {errors.schoolPeriod && <p className="text-xs text-destructive">{errors.schoolPeriod.message}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="profession">Profession <span className="text-destructive">*</span></Label>
-          <Input id="profession" placeholder="e.g. Software Engineer" {...register("profession")} />
+          <Label htmlFor="profession">{messages.dashboard.professionLabel} <span className="text-destructive">*</span></Label>
+          <Input id="profession" placeholder={messages.dashboard.professionPlaceholder} {...register("profession")} />
           {errors.profession && <p className="text-xs text-destructive">{errors.profession.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="company">Company / Organization</Label>
-          <Input id="company" placeholder="Company name" {...register("company")} />
+          <Label htmlFor="company">{messages.dashboard.companyOrg}</Label>
+          <Input id="company" placeholder={messages.dashboard.companyPlaceholder} {...register("company")} />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="permanentAddress">Permanent Address <span className="text-destructive">*</span></Label>
-        <Input id="permanentAddress" placeholder="e.g. Kathmandu-10, Bagmati Province" {...register("permanentAddress")} />
+        <Label htmlFor="permanentAddress">{messages.dashboard.permanentAddressLabel} <span className="text-destructive">*</span></Label>
+        <Input id="permanentAddress" placeholder={messages.dashboard.permanentAddressPlaceholder} {...register("permanentAddress")} />
         {errors.permanentAddress && <p className="text-xs text-destructive">{errors.permanentAddress.message}</p>}
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="city">Current City</Label>
-          <Input id="city" placeholder="e.g. Kathmandu" {...register("city")} />
+          <Label htmlFor="city">{messages.dashboard.currentCityLabel}</Label>
+          <Input id="city" placeholder={messages.dashboard.currentCityPlaceholder} {...register("city")} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="country">Country</Label>
-          <Input id="country" placeholder="e.g. Nepal" {...register("country")} />
+          <Label htmlFor="country">{messages.dashboard.countryLabel}</Label>
+          <Input id="country" placeholder={messages.dashboard.countryPlaceholder} {...register("country")} />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
-        <Input id="phone" placeholder="+977 98XXXXXXXX" {...register("phone")} />
+        <Label htmlFor="phone">{messages.dashboard.phoneNumberLabel} <span className="text-destructive">*</span></Label>
+        <Input id="phone" placeholder={messages.dashboard.phonePlaceholder} {...register("phone")} />
         {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="linkedin">LinkedIn URL</Label>
+          <Label htmlFor="linkedin">{messages.dashboard.linkedinUrl}</Label>
           <Input id="linkedin" placeholder="https://linkedin.com/in/..." {...register("linkedin")} />
           {errors.linkedin && <p className="text-xs text-destructive">{errors.linkedin.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="facebook">Facebook URL</Label>
+          <Label htmlFor="facebook">{messages.dashboard.facebookUrl}</Label>
           <Input id="facebook" placeholder="https://facebook.com/..." {...register("facebook")} />
           {errors.facebook && <p className="text-xs text-destructive">{errors.facebook.message}</p>}
         </div>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Fields marked <span className="text-destructive">*</span> are required.
+        {messages.dashboard.requiredFieldsHelp}
       </p>
 
       <Button type="submit" disabled={submitting} className="gradient-primary text-white border-0">
-        {submitting ? "Saving..." : "Save profile"}
+        {submitting ? messages.dashboard.saving : messages.dashboard.saveProfile}
       </Button>
     </form>
   );

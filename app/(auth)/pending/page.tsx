@@ -7,10 +7,11 @@ import { signOut } from "@/lib/auth";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Home } from "lucide-react";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export default async function PendingPage() {
   const session = await auth();
-  if (!session) redirect("/auth/login");
+  if (!session) redirect("/login");
   if (session.user?.status === "approved") redirect("/dashboard");
 
   return (
@@ -19,24 +20,23 @@ export default async function PendingPage() {
         <div className="flex size-20 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-900/30 mx-auto mb-6">
           <Clock className="size-10 text-amber-600" />
         </div>
-        <h1 className="text-2xl font-bold mb-3">Verification Pending</h1>
+        <h1 className="text-2xl font-bold mb-3"><I18nText id="authPages.verificationPending" fallback="Verification Pending" /></h1>
         <p className="text-muted-foreground mb-8">
-          Thank you for signing up! Your account is awaiting verification by our admin team.
-          You&apos;ll receive an email notification once your account is approved.
+          <I18nText id="authPages.pendingDesc" fallback="Thank you for signing up! Your account is awaiting verification by our admin team. You'll receive an email notification once your account is approved." />
         </p>
         <p className="text-sm text-muted-foreground mb-6">
-          Signed in as: <strong>{session.user?.email}</strong>
+          <I18nText id="authPages.signedInAs" fallback="Signed in as:" /> <strong>{session.user?.email}</strong>
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link href="/" className={cn(buttonVariants({ variant: "outline" }))}>
             <Home className="mr-2 size-4" />
-            Back to Home
+            <I18nText id="authPages.backHome" fallback="Back to Home" />
           </Link>
           <form action={async () => {
             "use server";
             await signOut({ redirectTo: "/" });
           }}>
-            <Button variant="ghost" type="submit">Sign Out</Button>
+            <Button variant="ghost" type="submit"><I18nText id="auth.signOut" fallback="Sign Out" /></Button>
           </form>
         </div>
       </div>

@@ -39,6 +39,7 @@ import {
 import { AdminUserEditDialog } from "./AdminUserEditDialog";
 import { formatDate } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 interface User {
   _id: string;
@@ -57,6 +58,7 @@ function isStaffRole(role: string) {
 }
 
 export function AdminUsersClient({ initialUsers }: { initialUsers: User[] }) {
+  const { messages } = useI18n();
   const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -199,7 +201,7 @@ export function AdminUsersClient({ initialUsers }: { initialUsers: User[] }) {
               onClick={() => setEditUserId(u._id)}
             >
               <Pencil className="size-3.5" />
-              Edit profile
+              {messages.adminUsers.editProfile}
             </Button>
           )}
 
@@ -218,7 +220,7 @@ export function AdminUsersClient({ initialUsers }: { initialUsers: User[] }) {
               }}
             >
               <Trash2 className="size-3.5" />
-              Remove account
+              {messages.adminUsers.delete}
             </Button>
           )}
           {u.status === "pending" && !staff && (
@@ -345,7 +347,7 @@ export function AdminUsersClient({ initialUsers }: { initialUsers: User[] }) {
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
           <Input
-            placeholder="Search by name or email…"
+            placeholder={messages.adminUsers.searchPlaceholder}
             className="pl-9"
             value={search}
             onChange={(e) => setSearch(e.target.value)}

@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       email: parsed.data.email,
       subject: sanitizeInput(parsed.data.subject, 200),
       message: sanitizeInput(parsed.data.message, 2000),
+      status: "pending",
       ip,
     });
 

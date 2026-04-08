@@ -4,6 +4,7 @@ import Event from "@/lib/models/Event";
 import Job from "@/lib/models/Job";
 import User from "@/lib/models/User";
 import { escapeRegex } from "@/lib/utils";
+import { purgeExpiredEvents } from "@/lib/server/purge-expired-events";
 
 export async function getArticlesListing(input: {
   page?: number;
@@ -64,7 +65,12 @@ export async function getJobsListing(input: {
   const limit = Math.min(50, input.limit ?? 20);
   const type = input.type;
   const q = input.q?.trim();
-  const filter: Record<string, unknown> = { status: "published", deletedAt: null };
+  const now = new Date();
+  const filter: Record<string, unknown> = {
+    status: "published",
+    deletedAt: null,
+    $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }],
+  };
   if (type) filter.type = type;
   if (q) {
     filter.$or = [
@@ -92,13 +98,26 @@ export async function getJobsListing(input: {
   };
 }
 
+/** Published jobs still open for applications (not past `expiresAt` when set). */
+export async function countActivePublishedJobs(): Promise<number> {
+  await connectDB();
+  const now = new Date();
+  return Job.countDocuments({
+    status: "published",
+    deletedAt: null,
+    $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }],
+  });
+}
+
 export async function getEventsListing(input: { page?: number; limit?: number; q?: string | null }) {
   await connectDB();
+  await purgeExpiredEvents();
   const page = Math.max(1, input.page ?? 1);
   const limit = Math.min(80, Math.max(1, input.limit ?? 20));
   const q = input.q?.trim();
+  const now = new Date();
 
-  const baseFilter = { status: "published" as const, deletedAt: null };
+  const baseFilter = { status: "published" as const, deletedAt: null, endDate: { $gte: now } };
   const filter =
     q && q.length > 0
       ? {

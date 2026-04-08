@@ -2,6 +2,7 @@ import connectDB from "@/lib/db";
 import Job from "@/lib/models/Job";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { AdminJobsClient, type AdminJobRow } from "./AdminJobsClient";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -35,8 +36,8 @@ export default async function AdminJobsPage() {
   return (
     <PageShell className="max-w-4xl space-y-6 px-0">
       <PageHeader
-        title="Job moderation"
-        description="Approve member-submitted listings or edit any post from the member dashboard. Published jobs appear on the public jobs page."
+        title={<I18nText id="adminPages.jobModerationTitle" fallback="Job moderation" />}
+        description={<I18nText id="adminPages.jobModerationDesc" fallback="Approve member-submitted listings or edit any post from the member dashboard. Published jobs appear on the public jobs page." />}
       />
       <AdminJobsClient initialJobs={initialJobs} />
     </PageShell>

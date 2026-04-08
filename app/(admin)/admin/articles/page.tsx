@@ -2,6 +2,7 @@ import connectDB from "@/lib/db";
 import Article from "@/lib/models/Article";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { AdminArticlesClient, type AdminArticleRow } from "./AdminArticlesClient";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -33,8 +34,8 @@ export default async function AdminArticlesPage() {
   return (
     <PageShell className="max-w-3xl space-y-6">
       <PageHeader
-        title="Article moderation"
-        description="Review pending submissions, read the full draft, fix issues in the editor, then approve or reject. Member posts need admin or superadmin approval before they appear on the site."
+        title={<I18nText id="adminPages.articleModerationTitle" fallback="Article moderation" />}
+        description={<I18nText id="adminPages.articleModerationDesc" fallback="Review pending submissions, read the full draft, fix issues in the editor, then approve or reject. Member posts need admin or superadmin approval before they appear on the site." />}
       />
       <AdminArticlesClient initialArticles={initialArticles} />
     </PageShell>

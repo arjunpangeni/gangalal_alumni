@@ -9,6 +9,7 @@ import { PenLine, FileText, Calendar, Sparkles, FileEdit, Archive } from "lucide
 import { MyArticlesActions } from "./MyArticlesActions";
 import { formatDate, cn } from "@/lib/utils";
 import { PageShell, PageHeader, PageEmptyState } from "@/components/layout/Page";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -90,7 +91,7 @@ export default async function MyArticlesPage() {
   return (
     <PageShell className="max-w-4xl px-0">
       <PageHeader
-        title="Your articles"
+        title={<I18nText id="dashboard.yourArticles" fallback="My Articles" />}
         description="Write new posts, edit drafts or published stories, and manage removal when needed. Published edits from members go through review again."
         action={
           <Link
@@ -98,7 +99,7 @@ export default async function MyArticlesPage() {
             className={`${buttonVariants({})} gradient-primary text-white border-0 shrink-0 inline-flex justify-center w-full sm:w-auto`}
           >
             <PenLine className="mr-2 size-4" />
-            Write new
+            <I18nText id="dashboard.writeAndManagePosts" fallback="Write and manage posts" />
           </Link>
         }
       />
@@ -106,8 +107,8 @@ export default async function MyArticlesPage() {
       {articles.length === 0 ? (
         <PageEmptyState
           icon={<FileText className="size-10" />}
-          title="No articles yet"
-          description='Start with "Write new" to create a draft or submit your first story.'
+          title={<I18nText id="dashboard.noArticlesYet" fallback="No articles yet" />}
+          description={<I18nText id="dashboard.createFirstListing" fallback='Start with "Write new" to create a draft or submit your first story.' />}
         />
       ) : (
         <ul className="flex flex-col gap-5">
@@ -150,7 +151,7 @@ export default async function MyArticlesPage() {
                     </CardDescription>
                     <div className="flex items-center gap-2 pl-[2.875rem] text-xs text-muted-foreground">
                       <Calendar className="size-3.5 shrink-0 opacity-70" aria-hidden />
-                      <span>Created {formatDate(a.createdAt)}</span>
+                      <span><I18nText id="dashboard.postedOn" fallback="Posted {date}" values={{ date: formatDate(a.createdAt) }} /></span>
                     </div>
                   </CardHeader>
 

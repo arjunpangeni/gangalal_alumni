@@ -9,8 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function AdminEventsClient() {
+  const { messages } = useI18n();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [acl, setAcl] = useState<"public" | "member">("public");
@@ -30,14 +32,14 @@ export function AdminEventsClient() {
     const tagsRaw = String(fd.get("tags") ?? "").trim();
 
     if (!title || !description || !venue || !startLocal || !endLocal) {
-      toast.error("Fill in title, description, venue, start and end.");
+      toast.error(messages.adminClients.fillRequiredEventFields);
       return;
     }
 
     const startDate = new Date(startLocal);
     const endDate = new Date(endLocal);
     if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-      toast.error("Invalid dates.");
+      toast.error(messages.adminClients.invalidDates);
       return;
     }
 
@@ -60,11 +62,11 @@ export function AdminEventsClient() {
       });
       const json = await res.json();
       if (json.success) {
-        toast.success("Event published.");
+        toast.success(messages.adminClients.eventPublished);
         form.reset();
         setAcl("public");
         router.refresh();
-      } else toast.error(json.error ?? "Failed.");
+      } else toast.error(json.error ?? messages.adminClients.failed);
     } finally {
       setSaving(false);
     }
@@ -75,69 +77,69 @@ export function AdminEventsClient() {
       <div className="rounded-xl border bg-card p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-semibold text-lg">Create event</h2>
-            <p className="text-sm text-muted-foreground">Open the form only when needed.</p>
+            <h2 className="font-semibold text-lg">{messages.adminClients.createEvent}</h2>
+            <p className="text-sm text-muted-foreground">{messages.adminClients.openFormWhenNeeded}</p>
           </div>
           <Button type="button" variant={showForm ? "outline" : "default"} onClick={() => setShowForm((v) => !v)}>
             <Plus className="mr-2 size-4" />
-            {showForm ? "Close form" : "Add event"}
+            {showForm ? messages.adminClients.closeForm : messages.adminClients.addEvent}
           </Button>
         </div>
       </div>
       {showForm ? (
         <form onSubmit={submit} className="rounded-xl border p-4 sm:p-6 space-y-4 bg-card">
-          <h2 className="font-semibold text-lg">Add event</h2>
+          <h2 className="font-semibold text-lg">{messages.adminClients.addEvent}</h2>
       <div className="space-y-2">
-        <Label htmlFor="ev-title">Title</Label>
+        <Label htmlFor="ev-title">{messages.adminPages.tableTitle}</Label>
         <Input id="ev-title" name="title" required minLength={3} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="ev-desc">Description</Label>
+        <Label htmlFor="ev-desc">{messages.adminClients.description}</Label>
         <Textarea id="ev-desc" name="description" className="min-h-[120px]" required minLength={10} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="ev-venue">Venue</Label>
+        <Label htmlFor="ev-venue">{messages.adminPages.tableVenue}</Label>
         <Input id="ev-venue" name="venue" required minLength={2} />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="ev-start">Start</Label>
+          <Label htmlFor="ev-start">{messages.adminPages.tableStart}</Label>
           <Input id="ev-start" name="startDate" type="datetime-local" required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="ev-end">End</Label>
+          <Label htmlFor="ev-end">{messages.adminClients.end}</Label>
           <Input id="ev-end" name="endDate" type="datetime-local" required />
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="ev-cap">Capacity (optional)</Label>
+          <Label htmlFor="ev-cap">{messages.adminClients.capacityOptional}</Label>
           <Input id="ev-cap" name="capacity" type="number" min={1} />
         </div>
         <div className="space-y-2">
-          <Label>Visibility</Label>
+          <Label>{messages.adminClients.visibility}</Label>
           <Select value={acl} onValueChange={(v) => setAcl(v as "public" | "member")}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="public">Public</SelectItem>
-              <SelectItem value="member">Members only</SelectItem>
+              <SelectItem value="public">{messages.adminClients.public}</SelectItem>
+              <SelectItem value="member">{messages.adminClients.membersOnly}</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="ev-rsvp">RSVP URL (optional)</Label>
+        <Label htmlFor="ev-rsvp">{messages.adminClients.rsvpUrlOptional}</Label>
         <Input id="ev-rsvp" name="rsvpUrl" type="url" placeholder="https://..." />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="ev-tags">Tags (comma-separated)</Label>
-        <Input id="ev-tags" name="tags" placeholder="reunion, campus" />
+        <Label htmlFor="ev-tags">{messages.adminClients.tagsComma}</Label>
+        <Input id="ev-tags" name="tags" placeholder={messages.adminClients.tagsPlaceholder} />
       </div>
       <Button type="submit" disabled={saving} className="gradient-primary text-white border-0">
         {saving ? <Loader2 className="size-4 animate-spin" /> : null}
-        Publish event
+        {messages.adminClients.publishEvent}
       </Button>
         </form>
       ) : null}

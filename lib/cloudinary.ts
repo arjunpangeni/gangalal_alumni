@@ -44,6 +44,7 @@ export const CLOUDINARY_FOLDERS = {
   covers: "alumni/covers",
   gallery: "alumni/gallery",
   events: "alumni/events",
+  committee: "alumni/committee",
 } as const;
 
 export type CloudinaryPurpose = keyof typeof CLOUDINARY_FOLDERS;

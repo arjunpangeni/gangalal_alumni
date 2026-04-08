@@ -7,8 +7,10 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { scheduleRouterRefresh } from "@/lib/schedule-router-refresh";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function MyJobDeleteButton({ slug, title }: { slug: string; title: string }) {
+  const { messages } = useI18n();
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -17,19 +19,19 @@ export function MyJobDeleteButton({ slug, title }: { slug: string; title: string
       <ConfirmDialog
         open={open}
         onOpenChange={setOpen}
-        title="Delete this job listing?"
-        description={`“${title}” will be removed from the public jobs page and your dashboard. This cannot be undone.`}
-        confirmLabel="Delete listing"
-        cancelLabel="Cancel"
+        title={messages.dashboard.delete}
+        description={`“${title}” ${messages.dashboard.listingDeleteDesc}`}
+        confirmLabel={messages.dashboard.delete}
+        cancelLabel={messages.dashboard.cancel}
         variant="destructive"
         onConfirm={async () => {
           const res = await fetch(`/api/jobs/${slug}`, { method: "DELETE" });
           const json = await res.json().catch(() => ({}));
           if (!res.ok || !json.success) {
-            toast.error(typeof json.error === "string" ? json.error : "Could not delete this listing.");
+            toast.error(typeof json.error === "string" ? json.error : messages.dashboard.couldNotDeleteListing);
             throw new Error("failed");
           }
-          toast.success("Listing removed.");
+          toast.success(messages.dashboard.listingRemoved);
           scheduleRouterRefresh(() => router.refresh());
         }}
       />
@@ -41,7 +43,7 @@ export function MyJobDeleteButton({ slug, title }: { slug: string; title: string
         onClick={() => setOpen(true)}
       >
         <Trash2 className="size-4 shrink-0" aria-hidden />
-        Delete
+        {messages.dashboard.delete}
       </Button>
     </>
   );

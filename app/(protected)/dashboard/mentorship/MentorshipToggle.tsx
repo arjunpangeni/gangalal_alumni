@@ -14,12 +14,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { X, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 interface Props {
   initial: { availableForMentorship: boolean; mentorshipBio: string; mentorshipSkills: string[] };
 }
 
 export function MentorshipToggle({ initial }: Props) {
+  const { messages } = useI18n();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [newSkill, setNewSkill] = useState("");
@@ -67,19 +69,19 @@ export function MentorshipToggle({ initial }: Props) {
     <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
       <Card className="border-border/80 shadow-sm">
         <CardHeader className="space-y-1 pb-4">
-          <CardTitle className="text-base">Availability</CardTitle>
+          <CardTitle className="text-base">{messages.dashboard.availability}</CardTitle>
           <CardDescription>Control whether you appear on the public Mentorship directory.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4 rounded-xl border bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 space-y-1 pr-2">
-              <p className="font-semibold text-foreground">Available as a mentor</p>
+              <p className="font-semibold text-foreground">{messages.dashboard.availableAsMentor}</p>
               <p className="text-sm leading-snug text-muted-foreground">
                 When enabled, members can see your mentor card and email you directly.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-3 self-start sm:self-center">
-              <span className="text-sm font-medium text-muted-foreground sm:hidden">{available ? "On" : "Off"}</span>
+              <span className="text-sm font-medium text-muted-foreground sm:hidden">{available ? messages.dashboard.on : messages.dashboard.off}</span>
               <Switch
                 checked={available}
                 onCheckedChange={(val) => setValue("availableForMentorship", val)}
@@ -93,12 +95,12 @@ export function MentorshipToggle({ initial }: Props) {
       {available ? (
         <Card className="border-border/80 shadow-sm">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-base">Your mentor profile</CardTitle>
+            <CardTitle className="text-base">{messages.dashboard.yourMentorProfile}</CardTitle>
             <CardDescription>Shown on your public mentor card together with your member profile photo and work details.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="mentorship-bio">Short introduction</Label>
+              <Label htmlFor="mentorship-bio">{messages.dashboard.shortIntroduction}</Label>
               <Textarea
                 id="mentorship-bio"
                 rows={4}
@@ -110,7 +112,7 @@ export function MentorshipToggle({ initial }: Props) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mentorship-skill-input">Topics you can help with</Label>
+              <Label htmlFor="mentorship-skill-input">{messages.dashboard.topicsYouCanHelpWith}</Label>
               <div className="flex flex-col gap-2 sm:flex-row">
                 <Input
                   id="mentorship-skill-input"
@@ -127,7 +129,7 @@ export function MentorshipToggle({ initial }: Props) {
                 />
                 <Button type="button" onClick={addSkill} variant="outline" className="min-h-11 w-full shrink-0 gap-1.5 sm:w-auto">
                   <Plus className="size-4" />
-                  Add
+                  {messages.dashboard.add}
                 </Button>
               </div>
               {skills.length > 0 ? (
@@ -156,10 +158,10 @@ export function MentorshipToggle({ initial }: Props) {
 
       <div className="flex flex-wrap items-center gap-3">
         <Button type="button" variant="outline" className="min-h-11 w-full sm:w-auto" onClick={() => router.push("/dashboard")}>
-          Cancel
+          {messages.dashboard.cancel}
         </Button>
         <Button type="submit" disabled={submitting} className="min-h-11 w-full gradient-primary border-0 text-white sm:w-auto">
-          {submitting ? "Saving…" : "Save settings"}
+          {submitting ? messages.dashboard.saving : messages.dashboard.saveSettings}
         </Button>
       </div>
     </form>

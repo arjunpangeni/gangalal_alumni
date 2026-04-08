@@ -6,7 +6,7 @@ import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session) redirect("/auth/login");
+  if (!session) redirect("/login");
   if (session.user?.role !== "admin" && session.user?.role !== "superadmin") redirect("/dashboard");
 
   return (

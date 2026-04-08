@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Loader2, X, Calendar } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { PageEmptyState } from "@/components/layout/Page";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 interface EventDoc {
   _id: string;
@@ -19,6 +20,7 @@ interface EventDoc {
 }
 
 export function EventsClient({ initialEvents }: { initialEvents: unknown[] }) {
+  const { messages } = useI18n();
   const [events, setEvents] = useState<EventDoc[]>(initialEvents as EventDoc[]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -63,14 +65,14 @@ export function EventsClient({ initialEvents }: { initialEvents: unknown[] }) {
     <div className="space-y-5 sm:space-y-6">
       <div className="flex flex-col gap-3 border-b border-border/50 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pb-5 lg:pb-4">
         <div className="min-w-0 flex-1">
-          <h1 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">Events</h1>
+          <h1 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">{messages.nav.events}</h1>
           <p className="mt-0.5 truncate text-xs leading-snug text-muted-foreground sm:text-sm">
-            Reunions, workshops, and meetups—in person and online.
+            {messages.publicClients.eventsSubtitle}
             {(!loading || events.length > 0) && (
               <span className="text-muted-foreground/80">
                 {" "}
                 · <span className="tabular-nums text-foreground/90">{events.length}</span>{" "}
-                {events.length === 1 ? "event" : "events"}
+                {events.length === 1 ? messages.publicClients.event : messages.nav.events}
               </span>
             )}
           </p>
@@ -81,18 +83,18 @@ export function EventsClient({ initialEvents }: { initialEvents: unknown[] }) {
             aria-hidden
           />
           <Input
-            placeholder="Search…"
+            placeholder={messages.publicClients.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-9 rounded-lg border-border/60 bg-background/90 py-2 pl-8 pr-16 text-sm shadow-sm transition-surface dark:bg-background/50"
-            aria-label="Search events"
+            aria-label={messages.publicClients.searchEvents}
           />
           {search ? (
             <button
               type="button"
               onClick={() => setSearch("")}
               className="absolute right-8 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-surface hover:bg-muted hover:text-foreground"
-              aria-label="Clear search"
+              aria-label={messages.publicClients.clearSearch}
             >
               <X className="size-3.5" />
             </button>
@@ -108,7 +110,7 @@ export function EventsClient({ initialEvents }: { initialEvents: unknown[] }) {
 
       {upcoming.length > 0 && (
         <section className="space-y-4 sm:space-y-5">
-          <h2 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">Upcoming</h2>
+          <h2 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">{messages.publicClients.upcoming}</h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {upcoming.map((e) => (
               <EventCard key={e._id} {...e} />
@@ -119,7 +121,7 @@ export function EventsClient({ initialEvents }: { initialEvents: unknown[] }) {
 
       {past.length > 0 && (
         <section className="space-y-4 sm:space-y-5">
-          <h2 className="font-heading text-lg font-semibold tracking-tight text-muted-foreground sm:text-xl">Past</h2>
+          <h2 className="font-heading text-lg font-semibold tracking-tight text-muted-foreground sm:text-xl">{messages.publicClients.past}</h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {past.map((e) => (
               <EventCard key={e._id} {...e} />
@@ -131,8 +133,16 @@ export function EventsClient({ initialEvents }: { initialEvents: unknown[] }) {
       {events.length === 0 && !loading && (
         <PageEmptyState
           icon={<Calendar className="size-10" />}
-          title="No events match your search"
-          description="Try another keyword, or check back later for new listings."
+          title={
+            search.trim()
+              ? messages.publicClients.noEventsMatch
+              : messages.publicClients.noEventsAvailable
+          }
+          description={
+            search.trim()
+              ? messages.publicClients.tryAnotherKeyword
+              : messages.publicClients.noEventsAvailableDesc
+          }
         />
       )}
     </div>

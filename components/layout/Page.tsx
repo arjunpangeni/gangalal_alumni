@@ -23,7 +23,7 @@ export function PageHeader({
   className,
   action,
 }: {
-  title: string;
+  title: ReactNode;
   description?: ReactNode;
   className?: string;
   action?: ReactNode;
@@ -43,7 +43,7 @@ export function PageHeader({
   );
 }
 
-export function SectionHeader({ title, className }: { title: string; className?: string }) {
+export function SectionHeader({ title, className }: { title: ReactNode; className?: string }) {
   return (
     <h2 className={cn("font-heading mb-4 text-lg font-semibold tracking-tight sm:mb-5 sm:text-xl", className)}>{title}</h2>
   );
@@ -56,8 +56,8 @@ export function PageEmptyState({
   className,
 }: {
   icon?: React.ReactNode;
-  title: string;
-  description?: string;
+  title: ReactNode;
+  description?: ReactNode;
   className?: string;
 }) {
   return (

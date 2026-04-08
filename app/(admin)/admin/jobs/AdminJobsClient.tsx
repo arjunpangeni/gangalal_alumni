@@ -28,6 +28,7 @@ import {
 import { formatDate, cn } from "@/lib/utils";
 import { PageEmptyState } from "@/components/layout/Page";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export interface AdminJobRow {
   _id: string;
@@ -42,11 +43,11 @@ export interface AdminJobRow {
 }
 
 const FILTERS = [
-  { id: "all", label: "All" },
-  { id: "pending", label: "Pending" },
-  { id: "published", label: "Published" },
-  { id: "draft", label: "Draft" },
-  { id: "archived", label: "Archived" },
+  { id: "all" },
+  { id: "pending" },
+  { id: "published" },
+  { id: "draft" },
+  { id: "archived" },
 ] as const;
 
 type FilterId = (typeof FILTERS)[number]["id"];
@@ -60,6 +61,7 @@ function parseJsonBody(text: string): { success?: boolean; error?: string; messa
 }
 
 export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] }) {
+  const { messages } = useI18n();
   const router = useRouter();
   const [jobs, setJobs] = useState<AdminJobRow[]>(initialJobs);
   const [filter, setFilter] = useState<FilterId>(() => {
@@ -105,10 +107,10 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
     }
     if (json.success) {
       setJobs((prev) => prev.map((j) => (j.slug === slug ? { ...j, status: "published" } : j)));
-      toast.success("Job published.");
+      toast.success(messages.adminClients.jobPublished);
       router.refresh();
     } else {
-      toast.error(json.error ?? "Failed.");
+      toast.error(json.error ?? messages.adminClients.failed);
     }
   }
 
@@ -121,7 +123,7 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
     if (!rejectSlug) return;
     const note = rejectNote.trim();
     if (note.length > 0 && note.length < 10) {
-      toast.error("Note must be at least 10 characters or leave empty.");
+      toast.error(messages.adminClients.noteMin10OrEmpty);
       return;
     }
     setRejectSubmitting(true);
@@ -143,12 +145,12 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
       if (json.success) {
         const slug = rejectSlug;
         setJobs((prev) => prev.map((j) => (j.slug === slug ? { ...j, status: "archived" } : j)));
-        toast.success("Listing rejected.");
+        toast.success(messages.adminClients.listingRejected);
         setRejectSlug(null);
         setRejectNote("");
         router.refresh();
       } else {
-        toast.error(json.error ?? "Failed.");
+        toast.error(json.error ?? messages.adminClients.failed);
       }
     } finally {
       setRejectSubmitting(false);
@@ -169,15 +171,15 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
           className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-950 dark:text-amber-100"
           role="status"
         >
-          <span className="font-medium">Action required:</span>{" "}
-          {counts.pending} listing{counts.pending === 1 ? "" : "s"} waiting for review.
+          <span className="font-medium">{messages.adminClients.actionRequired}</span>{" "}
+          {counts.pending} {messages.adminClients.listingsWaiting}
         </div>
       ) : null}
 
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <span className="font-medium text-foreground">{counts.all}</span>
-        <span>listings ·</span>
-        <span className="text-amber-700 dark:text-amber-400 font-medium">{counts.pending} pending</span>
+        <span>{messages.adminClients.listingsCountLabel} -</span>
+        <span className="text-amber-700 dark:text-amber-400 font-medium">{counts.pending} {messages.adminClients.pending}</span>
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 sm:flex-wrap sm:overflow-visible" role="tablist">
@@ -195,7 +197,7 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
                 : "border-border bg-background text-muted-foreground hover:bg-muted/60"
             )}
           >
-            {f.label}
+            {messages.adminClients[f.id]}
             <span className="ml-1.5 tabular-nums opacity-80">({counts[f.id]})</span>
           </button>
         ))}
@@ -204,8 +206,8 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
       {filtered.length === 0 ? (
         <PageEmptyState
           icon={<Briefcase className="size-10" />}
-          title="No listings in this view"
-          description="Try another filter or wait for new submissions."
+          title={messages.adminClients.noListingsInView}
+          description={messages.adminClients.tryAnotherFilter}
         />
       ) : (
         <ul className="grid gap-3 sm:gap-4 list-none p-0 m-0">
@@ -236,7 +238,7 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
                   </span>
                 </div>
                 {j.authorId?.name ? (
-                  <p className="text-xs text-muted-foreground mt-2">Posted by {j.authorId.name}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{messages.adminClients.postedBy} {j.authorId.name}</p>
                 ) : null}
               </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap pt-2 border-t">
@@ -245,14 +247,14 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
                   className={`${buttonVariants({ variant: "secondary", size: "lg" })} w-full sm:w-auto gap-2 justify-center min-h-11`}
                 >
                   <Eye className="size-4" />
-                  View on site
+                  {messages.adminClients.viewOnSite}
                 </Link>
                 <Link
                   href={`/dashboard/jobs/edit/${j.slug}`}
                   className={`${buttonVariants({ variant: "outline", size: "lg" })} w-full sm:w-auto gap-2 justify-center min-h-11`}
                 >
                   <FilePenLine className="size-4" />
-                  Edit
+                  {messages.dashboard.edit}
                 </Link>
                 {j.status === "pending" ? (
                   <>
@@ -263,7 +265,7 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
                       onClick={() => void approve(j.slug)}
                     >
                       <CheckCircle className="size-4" />
-                      Approve
+                      {messages.adminClients.approve}
                     </Button>
                     <Button
                       type="button"
@@ -273,7 +275,7 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
                       onClick={() => openReject(j.slug)}
                     >
                       <XCircle className="size-4" />
-                      Reject
+                      {messages.adminClients.reject}
                     </Button>
                   </>
                 ) : null}
@@ -294,16 +296,15 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
       >
         <DialogContent className="sm:max-w-md" showCloseButton>
           <DialogHeader>
-            <DialogTitle>Reject listing</DialogTitle>
+            <DialogTitle>{messages.adminClients.rejectListing}</DialogTitle>
             <DialogDescription>
-              Optional note for the author (at least 10 characters if you add one). Leave blank to reject without a
-              note.
+              {messages.adminClients.rejectListingDesc}
             </DialogDescription>
           </DialogHeader>
           <Textarea
             value={rejectNote}
             onChange={(e) => setRejectNote(e.target.value)}
-            placeholder="Reason (optional)…"
+            placeholder={messages.adminClients.reasonOptional}
             rows={4}
             className="min-h-24"
             disabled={rejectSubmitting}
@@ -318,7 +319,7 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
               }}
               disabled={rejectSubmitting}
             >
-              Cancel
+              {messages.dashboard.cancel}
             </Button>
             <Button
               type="button"
@@ -326,7 +327,7 @@ export function AdminJobsClient({ initialJobs }: { initialJobs: AdminJobRow[] })
               onClick={() => void confirmReject()}
               disabled={rejectSubmitting}
             >
-              {rejectSubmitting ? "Rejecting…" : "Reject"}
+              {rejectSubmitting ? messages.adminClients.rejecting : messages.adminClients.reject}
             </Button>
           </DialogFooter>
         </DialogContent>

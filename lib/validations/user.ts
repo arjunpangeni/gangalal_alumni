@@ -50,8 +50,13 @@ export const contactSchema = z.object({
   message: z.string().min(20).max(2000),
 });
 
+export const adminContactStatusPatchSchema = z.object({
+  status: z.enum(["pending", "resolved"]),
+});
+
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 export type AdminUserProfilePutInput = z.infer<typeof adminUserProfilePutSchema>;
 export type AdminUserActionInput = z.infer<typeof adminUserActionSchema>;
 export type MentorshipUpdateInput = z.infer<typeof mentorshipUpdateSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
+export type AdminContactStatusPatchInput = z.infer<typeof adminContactStatusPatchSchema>;

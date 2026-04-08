@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { PageEmptyState } from "@/components/layout/Page";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export interface GalleryAlbum {
   _id: string;
@@ -25,6 +26,7 @@ function albumMatchesQuery(album: GalleryAlbum, q: string): boolean {
 }
 
 export function GalleryClient({ albums }: { albums: GalleryAlbum[] }) {
+  const { messages } = useI18n();
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => albums.filter((a) => albumMatchesQuery(a, search)), [albums, search]);
@@ -33,9 +35,9 @@ export function GalleryClient({ albums }: { albums: GalleryAlbum[] }) {
     <div className="space-y-5 sm:space-y-6">
       <div className="flex flex-col gap-3 border-b border-border/50 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pb-5 lg:pb-4">
         <div className="min-w-0 flex-1">
-          <h1 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">Gallery</h1>
+          <h1 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">{messages.nav.gallery}</h1>
           <p className="mt-0.5 truncate text-xs leading-snug text-muted-foreground sm:text-sm">
-            Browse albums—open one for a full-screen viewer with zoom.
+            {messages.publicClients.gallerySubtitle}
             {albums.length > 0 && (
               <span className="text-muted-foreground/80">
                 {" "}
@@ -46,7 +48,7 @@ export function GalleryClient({ albums }: { albums: GalleryAlbum[] }) {
                     of <span className="tabular-nums">{albums.length}</span>
                   </>
                 ) : null}{" "}
-                album{filtered.length === 1 ? "" : "s"}
+                {filtered.length === 1 ? messages.publicClients.album : messages.publicClients.albums}
               </span>
             )}
           </p>
@@ -57,18 +59,18 @@ export function GalleryClient({ albums }: { albums: GalleryAlbum[] }) {
             aria-hidden
           />
           <Input
-            placeholder="Search…"
+            placeholder={messages.publicClients.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-9 rounded-lg border-border/60 bg-background/90 py-2 pl-8 pr-10 text-sm shadow-sm transition-surface dark:bg-background/50"
-            aria-label="Search albums"
+            aria-label={messages.publicClients.searchAlbums}
           />
           {search ? (
             <button
               type="button"
               onClick={() => setSearch("")}
               className="absolute right-2.5 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-surface hover:bg-muted hover:text-foreground"
-              aria-label="Clear search"
+              aria-label={messages.publicClients.clearSearch}
             >
               <X className="size-3.5" />
             </button>
@@ -99,7 +101,7 @@ export function GalleryClient({ albums }: { albums: GalleryAlbum[] }) {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent opacity-90" />
                   <span className="absolute bottom-3 right-3 rounded-full bg-black/45 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm tabular-nums">
-                    {count} photo{count === 1 ? "" : "s"}
+                    {count} {count === 1 ? messages.publicClients.photo : messages.publicClients.photos}
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col p-4 sm:p-5">
@@ -118,8 +120,8 @@ export function GalleryClient({ albums }: { albums: GalleryAlbum[] }) {
           <div className="col-span-full">
             <PageEmptyState
               icon={<Images className="size-10" />}
-              title="No albums yet"
-              description="Photo albums will appear here."
+              title={messages.publicClients.noAlbumsYet}
+              description={messages.publicClients.photoAlbumsAppear}
             />
           </div>
         )}
@@ -127,8 +129,8 @@ export function GalleryClient({ albums }: { albums: GalleryAlbum[] }) {
           <div className="col-span-full">
             <PageEmptyState
               icon={<Images className="size-10" />}
-              title="No albums match your search"
-              description="Try another title or keyword from the description."
+              title={messages.publicClients.noAlbumsMatch}
+              description={messages.publicClients.tryAnotherTitle}
             />
           </div>
         )}

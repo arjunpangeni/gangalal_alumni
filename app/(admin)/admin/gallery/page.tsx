@@ -2,6 +2,7 @@ import connectDB from "@/lib/db";
 import Album from "@/lib/models/Album";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { AdminGalleryClient, type AdminAlbumRow } from "./AdminGalleryClient";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -33,13 +34,8 @@ export default async function AdminGalleryPage() {
   return (
     <PageShell className="max-w-4xl px-0 space-y-6">
       <PageHeader
-        title="Gallery"
-        description={
-          <>
-            Create albums and upload photos (stored in Cloudinary). Published albums appear on the public{" "}
-            <span className="text-foreground font-medium">/gallery</span> page.
-          </>
-        }
+        title={<I18nText id="adminPages.galleryTitle" fallback="Gallery" />}
+        description={<I18nText id="adminPages.galleryDesc" fallback="Create albums and upload photos. Published albums appear on the public /gallery page." />}
       />
       <AdminGalleryClient initialAlbums={initialAlbums} />
     </PageShell>

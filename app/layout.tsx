@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import { Fraunces, Noto_Sans_Devanagari, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
+import { I18nProvider } from "@/components/i18n/I18nProvider";
 import { NETWORK_NAME, NETWORK_TAGLINE } from "@/lib/brand";
+import { getMetadataBase } from "@/lib/site-url";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+
+const metadataBase = getMetadataBase();
 
 const notoDevanagari = Noto_Sans_Devanagari({
   subsets: ["devanagari", "latin", "latin-ext"],
@@ -29,6 +33,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
+  ...(metadataBase ? { metadataBase } : {}),
   title: { default: NETWORK_NAME, template: `%s | ${NETWORK_NAME}` },
   description: NETWORK_TAGLINE,
   openGraph: { type: "website", siteName: NETWORK_NAME },
@@ -44,8 +49,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="min-h-screen antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
-          <Toaster richColors position="top-right" />
+          <I18nProvider>
+            {children}
+            <Toaster richColors position="top-right" />
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

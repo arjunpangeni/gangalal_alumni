@@ -4,22 +4,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Users, BookOpen, Calendar, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 const items = [
-  { href: "/", icon: Home, label: "Home" },
-  { href: "/members", icon: Users, label: "Members" },
-  { href: "/articles", icon: BookOpen, label: "Articles" },
-  { href: "/events", icon: Calendar, label: "Events" },
-  { href: "/jobs", icon: Briefcase, label: "Jobs" },
-];
+  { href: "/", icon: Home, key: "home" },
+  { href: "/members", icon: Users, key: "members" },
+  { href: "/articles", icon: BookOpen, key: "articles" },
+  { href: "/events", icon: Calendar, key: "events" },
+  { href: "/jobs", icon: Briefcase, key: "jobs" },
+] as const;
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { messages } = useI18n();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t bg-background/95 backdrop-blur-xl">
       <div className="flex items-center justify-around py-2">
-        {items.map(({ href, icon: Icon, label }) => {
+        {items.map(({ href, icon: Icon, key }) => {
           const active = pathname === href || (href !== "/" && pathname.startsWith(href));
           return (
             <Link
@@ -34,7 +36,7 @@ export function MobileBottomNav() {
               )}
             >
               <Icon className="size-5" aria-hidden />
-              <span className="text-[10px] font-semibold leading-none">{label}</span>
+              <span className="text-[10px] font-semibold leading-none">{messages.nav[key]}</span>
             </Link>
           );
         })}

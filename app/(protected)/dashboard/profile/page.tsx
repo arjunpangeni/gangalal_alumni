@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import User from "@/lib/models/User";
 import { ProfilePageClient, type ProfileViewUser } from "./ProfilePageClient";
 import { PageShell, PageHeader } from "@/components/layout/Page";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -44,7 +45,10 @@ export default async function ProfilePage() {
 
   return (
     <PageShell narrow className="px-0">
-      <PageHeader title="My profile" description="Your public profile and contact details." />
+      <PageHeader
+        title={<I18nText id="dashboard.myProfileTitle" fallback="My profile" />}
+        description={<I18nText id="dashboard.publicProfileDetails" fallback="Your public profile and contact details." />}
+      />
       <ProfilePageClient user={viewUser} />
     </PageShell>
   );

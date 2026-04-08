@@ -253,7 +253,7 @@ export function GalleryAlbumExperience({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] flex flex-col bg-zinc-950/95 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex h-[100dvh] max-h-[100dvh] flex-col bg-zinc-950/95 backdrop-blur-md"
           >
             <div className="h-0.5 w-full bg-zinc-800">
               <motion.div
@@ -313,7 +313,7 @@ export function GalleryAlbumExperience({
             </div>
 
             <div
-              className="relative flex min-h-0 flex-1 touch-pan-y items-center justify-center"
+              className="relative flex min-h-0 min-w-0 flex-1 touch-pan-y items-stretch justify-center"
               onClick={() => setOpen(null)}
               onTouchStart={(e) => {
                 if (e.touches.length === 2) {
@@ -374,7 +374,7 @@ export function GalleryAlbumExperience({
               <div
                 ref={viewerRef}
                 className={cn(
-                  "flex max-h-full max-w-full flex-col items-center justify-center overflow-hidden p-2 sm:p-4",
+                  "flex h-full min-h-0 w-full min-w-0 max-w-full flex-col items-stretch justify-center overflow-hidden px-1 py-0 sm:px-2 xl:items-center xl:px-4 xl:py-4",
                   scale > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in"
                 )}
                 onClick={(e) => e.stopPropagation()}
@@ -383,37 +383,41 @@ export function GalleryAlbumExperience({
                 onPointerUp={onPointerUpPan}
                 onPointerCancel={onPointerUpPan}
               >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={open}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: reduceMotion ? 0.12 : 0.18 }}
-                    className="relative flex max-h-[min(72dvh,100%)] max-w-full items-center justify-center"
-                  >
-                    <div
-                      className="flex max-h-[min(72dvh,100%)] max-w-full items-center justify-center will-change-transform"
-                      style={{
-                        transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
-                        transition: dragging ? "none" : "transform 0.1s ease-out",
-                      }}
+                <div className="flex min-h-0 min-w-0 flex-1 items-center justify-center xl:flex-none xl:items-center">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={open}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: reduceMotion ? 0.12 : 0.18 }}
+                      className="relative flex h-full max-h-full w-full max-w-full items-center justify-center xl:h-auto xl:max-h-[min(85dvh,100%)]"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element -- dynamic Cloudinary URL */}
-                      <img
-                        src={lightboxSrc(photos[open]!.url)}
-                        alt={photos[open]?.caption || `Photo ${open + 1}`}
-                        className="h-auto max-h-[min(72dvh,100%)] w-auto max-w-[min(calc(100vw-5rem),1400px)] object-contain select-none shadow-2xl lg:max-w-[min(calc(100vw-8rem),1700px)]"
-                        draggable={false}
-                        onDoubleClick={onImageDoubleClick}
-                      />
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
+                      <div
+                        className="flex h-full max-h-full w-full max-w-full items-center justify-center will-change-transform xl:h-auto xl:max-h-[min(85dvh,100%)] xl:w-auto"
+                        style={{
+                          transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+                          transition: dragging ? "none" : "transform 0.1s ease-out",
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element -- dynamic Cloudinary URL */}
+                        <img
+                          src={lightboxSrc(photos[open]!.url)}
+                          alt={photos[open]?.caption || `Photo ${open + 1}`}
+                          className="h-auto max-h-full w-auto max-w-full object-contain object-center select-none shadow-2xl sm:max-h-full xl:max-h-[min(85dvh,100%)] xl:max-w-[min(calc(100vw-8rem),1700px)]"
+                          draggable={false}
+                          onDoubleClick={onImageDoubleClick}
+                        />
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
                 {photos[open]?.caption ? (
-                  <p className="mt-3 max-w-xl text-center text-sm text-zinc-300">{photos[open]?.caption}</p>
+                  <p className="mt-2 max-w-xl shrink-0 px-1 text-center text-xs leading-snug text-zinc-300 sm:text-sm xl:mt-3">
+                    {photos[open]?.caption}
+                  </p>
                 ) : null}
-                <p className="mt-2 hidden text-center text-[11px] text-zinc-500 sm:block">
+                <p className="mt-1 hidden shrink-0 text-center text-[11px] text-zinc-500 xl:mt-2 xl:block">
                   Scroll to zoom · double-click image to reset or 2× · +/- keys
                 </p>
               </div>

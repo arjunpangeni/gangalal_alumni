@@ -6,9 +6,9 @@ import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session) redirect("/auth/login");
-  if (session.user?.status === "pending") redirect("/auth/pending");
-  if (session.user?.status === "rejected" || session.user?.status === "banned") redirect("/auth/access-denied");
+  if (!session) redirect("/login");
+  if (session.user?.status === "pending") redirect("/pending");
+  if (session.user?.status === "rejected" || session.user?.status === "banned") redirect("/access-denied");
 
   return (
     <SessionProvider>

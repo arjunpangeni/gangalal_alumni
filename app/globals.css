@@ -40,6 +40,11 @@
   --font-sans: var(--font-body);
   --font-heading: var(--font-fraunces), var(--font-noto-devanagari), "Noto Sans Devanagari", ui-serif, Georgia, serif;
   --font-display: var(--font-heading);
+  /* Set by app/(public)/articles/layout.tsx — readable listing + article pages */
+  --font-article-serif: ui-serif, Georgia, "Times New Roman", serif;
+  --font-article-heading: ui-sans-serif, system-ui, sans-serif;
+  /* Set by app/(public)/(home)/layout.tsx — Source Sans 3 + Noto (news-style reading) */
+  --font-home-news: ui-sans-serif, system-ui, sans-serif;
 
   /* Gradient tokens */
   --gradient-primary: linear-gradient(135deg, oklch(0.6 0.2 250) 0%, oklch(0.55 0.25 290) 100%);
@@ -126,6 +131,164 @@ body {
 @keyframes gradientShift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+
+/* Homepage notices: shifting gradient frame + soft glow */
+@keyframes home-notice-aurora {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes home-notice-icon {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.07) rotate(-5deg); }
+  40% { transform: scale(1.07) rotate(5deg); }
+  60% { transform: scale(1.05) rotate(0deg); }
+}
+
+.home-notice-frame {
+  border-radius: var(--radius-xl);
+  padding: 2px;
+  background-image: linear-gradient(
+    125deg,
+    oklch(0.52 0.16 264 / 0.55),
+    oklch(0.58 0.19 290 / 0.5),
+    oklch(0.55 0.16 200 / 0.48),
+    oklch(0.53 0.17 310 / 0.5),
+    oklch(0.52 0.16 264 / 0.55)
+  );
+  background-size: 320% 320%;
+  animation: home-notice-aurora 8s ease-in-out infinite;
+  box-shadow:
+    0 0 0 1px oklch(0.55 0.12 264 / 0.14),
+    0 14px 44px -14px oklch(0.48 0.16 264 / 0.38),
+    0 0 60px -20px oklch(0.55 0.18 275 / 0.25);
+}
+
+.dark .home-notice-frame {
+  background-image: linear-gradient(
+    125deg,
+    oklch(0.62 0.12 264 / 0.38),
+    oklch(0.58 0.15 290 / 0.34),
+    oklch(0.55 0.12 230 / 0.32),
+    oklch(0.6 0.13 300 / 0.34),
+    oklch(0.62 0.12 264 / 0.38)
+  );
+  box-shadow:
+    0 0 0 1px oklch(0.72 0.1 264 / 0.2),
+    0 18px 52px -18px oklch(0.52 0.14 264 / 0.45),
+    0 0 72px -24px oklch(0.58 0.14 275 / 0.22);
+}
+
+.home-notice-inner {
+  border-radius: calc(var(--radius-xl) - 2px);
+  background: oklch(1 0.006 264 / 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .home-notice-inner {
+  background: oklch(0.2 0.035 264 / 0.92);
+}
+
+.home-notice-icon {
+  animation: home-notice-icon 4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-notice-frame {
+    animation: none;
+    background-position: 50% 50%;
+  }
+  .home-notice-icon {
+    animation: none;
+  }
+}
+
+/* Homepage: news-style rhythm (Source Sans 3 in (home)/layout.tsx) */
+.home-typography {
+  font-family: var(--font-home-news), var(--font-noto-devanagari), "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
+  font-optical-sizing: auto;
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+@media (min-width: 640px) {
+  .home-typography {
+    font-size: 1.0625rem;
+    line-height: 1.68;
+  }
+}
+.home-typography .font-heading,
+.home-typography h1,
+.home-typography h2,
+.home-typography h3 {
+  font-family: var(--font-home-news), var(--font-noto-devanagari), "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+/* Calmer section heads — closer to portal section titles */
+.home-typography h2 {
+  font-size: clamp(1.2rem, 1.1vw + 1rem, 1.5rem);
+  line-height: 1.35;
+  font-weight: 700;
+}
+.home-typography h3 {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.home-typography .text-display,
+.home-typography .text-title {
+  font-family: var(--font-home-news), var(--font-noto-devanagari), "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
+}
+.home-typography button,
+.home-typography [role="button"],
+.home-typography input,
+.home-typography textarea,
+.home-typography select {
+  font-family: var(--font-home-news), var(--font-noto-devanagari), "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
+}
+/* Stats: solid type instead of animated gradient (less “marketing”, more news) */
+.home-typography .gradient-text {
+  background: none;
+  background-size: auto;
+  -webkit-text-fill-color: unset;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  color: var(--color-primary);
+  animation: none;
+}
+.dark .home-typography .gradient-text {
+  color: var(--color-primary);
+}
+
+/* Article routes: editorial serif body + clean sans headings (fonts loaded in articles/layout.tsx) */
+.articles-typography {
+  font-family: var(--font-article-serif), var(--font-noto-devanagari), "Noto Sans Devanagari", ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+}
+.articles-typography .font-heading,
+.articles-typography h1,
+.articles-typography h2,
+.articles-typography h3 {
+  font-family: var(--font-article-heading), var(--font-noto-devanagari), "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
+}
+.articles-typography .article-body {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.articles-typography .article-body strong {
+  font-weight: 600;
+}
+/* Keep form controls in the heading sans for clarity */
+.articles-typography input,
+.articles-typography textarea,
+.articles-typography select,
+.articles-typography button {
+  font-family: var(--font-article-heading), var(--font-noto-devanagari), "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Responsive fluid typography (display uses Fraunces via font-heading) */

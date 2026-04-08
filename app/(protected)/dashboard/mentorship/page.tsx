@@ -5,6 +5,7 @@ import { MentorshipToggle } from "./MentorshipToggle";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -18,8 +19,8 @@ export default async function DashboardMentorshipPage() {
   return (
     <PageShell className="max-w-2xl space-y-6 px-0">
       <PageHeader
-        title="Mentorship"
-        description="Offer guidance in areas you know well. When you opt in, your mentor card appears on the public Mentorship page with your profile details and email so others can reach you."
+        title={<I18nText id="dashboard.mentorship" fallback="Mentorship" />}
+        description={<I18nText id="dashboard.offerGuidance" fallback="Offer guidance" />}
         className="mb-0"
       />
 
@@ -29,7 +30,7 @@ export default async function DashboardMentorshipPage() {
             <Sparkles className="size-5 text-emerald-600 dark:text-emerald-400" aria-hidden />
           </div>
           <div className="min-w-0 space-y-1 text-sm leading-relaxed">
-            <p className="font-medium text-foreground">How it works</p>
+            <p className="font-medium text-foreground"><I18nText id="dashboard.howItWorks" fallback="How it works" /></p>
             <p className="text-muted-foreground">
               Turn on <strong className="text-foreground">Available as a mentor</strong>, write a short introduction, add topics
               you can help with, and save. Your listing uses the same name, photo, and work details as your public member profile,

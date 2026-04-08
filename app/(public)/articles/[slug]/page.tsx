@@ -11,6 +11,7 @@ import { estimateArticleReadMinutes } from "@/lib/article-read-time";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
+import { absoluteContentUrl, getMetadataBase } from "@/lib/site-url";
 export const revalidate = 60;
 
 interface ArticleDoc {
@@ -29,12 +30,45 @@ interface ArticleDoc {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   await connectDB();
-  const article = await Article.findOne({ slug, status: "published", deletedAt: null }).select("title excerpt").lean() as { title?: string; excerpt?: string } | null;
+  const article = (await Article.findOne({ slug, status: "published", deletedAt: null })
+    .select("title excerpt coverImage createdAt")
+    .lean()) as { title?: string; excerpt?: string; coverImage?: string; createdAt?: Date } | null;
   if (!article) return { title: "Article Not Found" };
+
+  const title = article.title ?? "";
+  const description = article.excerpt ?? "";
+  const imageUrl = absoluteContentUrl(article.coverImage);
+  const base = getMetadataBase();
+  let pageUrl: string | undefined;
+  if (base) {
+    try {
+      pageUrl = new URL(`/articles/${slug}`, base).href;
+    } catch {
+      pageUrl = undefined;
+    }
+  }
+
+  const images = imageUrl
+    ? [{ url: imageUrl, alt: title || "Article cover" }]
+    : undefined;
+
   return {
-    title: article.title,
-    description: article.excerpt,
-    openGraph: { title: article.title ?? "", description: article.excerpt ?? "" },
+    title,
+    description,
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url: pageUrl,
+      publishedTime: article.createdAt instanceof Date ? article.createdAt.toISOString() : undefined,
+      images,
+    },
+    twitter: {
+      card: imageUrl ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
   };
 }
 

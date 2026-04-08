@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import { ManageAdminsClient } from "./ManageAdminsClient";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -42,8 +43,8 @@ export default async function ManageAdminsPage() {
   return (
     <PageShell className="max-w-4xl px-0">
       <PageHeader
-        title="Manage admins"
-        description="Grant or revoke admin access for approved members. Superadmin accounts are not listed here."
+        title={<I18nText id="adminPages.manageAdminsTitle" fallback="Manage admins" />}
+        description={<I18nText id="adminPages.manageAdminsDesc" fallback="Grant or revoke admin access for approved members. Superadmin accounts are not listed here." />}
       />
       <ManageAdminsClient initialAdmins={serial(admins)} initialCandidates={serial(candidates)} />
     </PageShell>

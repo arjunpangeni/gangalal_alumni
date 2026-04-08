@@ -7,6 +7,7 @@ import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { scheduleRouterRefresh } from "@/lib/schedule-router-refresh";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 interface Props {
   slug: string;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function MyArticlesActions({ slug, status, isStaff }: Props) {
+  const { messages } = useI18n();
   const router = useRouter();
   const [confirmKind, setConfirmKind] = useState<null | "request-delete" | "direct-delete">(null);
   const canEdit = status === "draft" || status === "pending" || status === "published";
@@ -29,10 +31,10 @@ export function MyArticlesActions({ slug, status, isStaff }: Props) {
         onOpenChange={(open) => {
           if (!open) setConfirmKind(null);
         }}
-        title="Request deletion?"
-        description="This tells an admin you want this article removed. It stays visible until they process the request. You can keep editing until then."
-        confirmLabel="Send request"
-        cancelLabel="Cancel"
+        title={messages.dashboard.requestDeletionTitle}
+        description={messages.dashboard.requestDeletionDesc}
+        confirmLabel={messages.dashboard.sendRequest}
+        cancelLabel={messages.dashboard.cancel}
         onConfirm={async () => {
           const res = await fetch(`/api/articles/${slug}`, {
             method: "PATCH",
@@ -41,10 +43,10 @@ export function MyArticlesActions({ slug, status, isStaff }: Props) {
           });
           const json = await res.json();
           if (!json.success) {
-            toast.error(json.error ?? "Failed to submit request.");
+            toast.error(json.error ?? messages.dashboard.failedSubmitRequest);
             throw new Error("failed");
           }
-          toast.success("Deletion request sent. An admin will follow up.");
+          toast.success(messages.dashboard.deletionRequestSent);
           scheduleRouterRefresh(() => router.refresh());
         }}
       />
@@ -53,23 +55,23 @@ export function MyArticlesActions({ slug, status, isStaff }: Props) {
         onOpenChange={(open) => {
           if (!open) setConfirmKind(null);
         }}
-        title={isPublished ? "Remove this article from the site?" : "Delete this article?"}
+        title={isPublished ? messages.dashboard.removeFromSiteTitle : messages.dashboard.deleteArticleTitle}
         description={
           isPublished
-            ? "It will no longer appear in public lists. This cannot be undone."
-            : "This cannot be undone."
+            ? messages.dashboard.removeFromSiteDesc
+            : messages.dashboard.cannotUndo
         }
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        confirmLabel={messages.dashboard.delete}
+        cancelLabel={messages.dashboard.cancel}
         variant="destructive"
         onConfirm={async () => {
           const res = await fetch(`/api/articles/${slug}`, { method: "DELETE" });
           const json = await res.json();
           if (!json.success) {
-            toast.error(json.error ?? "Failed to delete.");
+            toast.error(json.error ?? messages.dashboard.failedDelete);
             throw new Error("failed");
           }
-          toast.success("Article deleted.");
+          toast.success(messages.dashboard.articleDeleted);
           scheduleRouterRefresh(() => router.refresh());
         }}
       />
@@ -83,7 +85,7 @@ export function MyArticlesActions({ slug, status, isStaff }: Props) {
             onClick={() => router.push(`/articles/${slug}`)}
           >
             <ExternalLink className="size-3.5 shrink-0 opacity-70" />
-            View live
+            {messages.dashboard.viewLive ?? "View live"}
           </Button>
         ) : null}
         {canEdit && !isArchived ? (
@@ -94,7 +96,7 @@ export function MyArticlesActions({ slug, status, isStaff }: Props) {
             onClick={() => router.push(`/content/edit/${slug}`)}
           >
             <Pencil className="size-3.5 shrink-0" />
-            {isPublished && !isStaff ? "Edit (re-review)" : "Edit"}
+            {isPublished && !isStaff ? messages.dashboard.editRereview : messages.dashboard.edit}
           </Button>
         ) : null}
         {!isArchived ? (
@@ -107,7 +109,7 @@ export function MyArticlesActions({ slug, status, isStaff }: Props) {
               onClick={() => setConfirmKind("direct-delete")}
             >
               <Trash2 className="size-3.5 shrink-0" />
-              Delete
+              {messages.dashboard.delete}
             </Button>
           ) : (
             <Button
@@ -118,14 +120,14 @@ export function MyArticlesActions({ slug, status, isStaff }: Props) {
               onClick={() => setConfirmKind("request-delete")}
             >
               <Trash2 className="size-3.5 shrink-0" />
-              Request delete
+              {messages.dashboard.requestDelete ?? "Request delete"}
             </Button>
           )
         ) : null}
       </div>
       {isPublished && !isStaff ? (
         <p className="text-[11px] leading-relaxed text-muted-foreground sm:text-right sm:ml-auto sm:max-w-[19rem]">
-          Editing sends your article for approval again; it may be hidden from the public list until an admin approves.
+          {messages.dashboard.editResubmitHelp}
         </p>
       ) : null}
     </div>

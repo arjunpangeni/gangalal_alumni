@@ -3,7 +3,7 @@
  * Always use the `folder` returned by /api/upload/sign — it must match the signature.
  */
 
-export type CloudinarySignPurpose = "articles" | "covers" | "gallery" | "events" | "avatars";
+export type CloudinarySignPurpose = "articles" | "covers" | "gallery" | "events" | "avatars" | "committee";
 
 export type CloudinaryUploadResult = { secureUrl: string; publicId: string };
 

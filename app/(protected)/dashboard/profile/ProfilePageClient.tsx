@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Pencil } from "lucide-react";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export type ProfileViewUser = {
   name: string;
@@ -32,6 +33,7 @@ function getProfile(p: Record<string, string | number | undefined> | undefined, 
 }
 
 export function ProfilePageClient({ user }: { user: ProfileViewUser }) {
+  const { messages } = useI18n();
   const router = useRouter();
   const [editing, setEditing] = useState(false);
 
@@ -41,9 +43,9 @@ export function ProfilePageClient({ user }: { user: ProfileViewUser }) {
     return (
       <div className="w-full max-w-2xl space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-lg font-semibold">Edit profile</h2>
+          <h2 className="text-lg font-semibold">{messages.dashboard.editProfile}</h2>
           <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto shrink-0" onClick={() => setEditing(false)}>
-            Cancel
+            {messages.dashboard.cancel}
           </Button>
         </div>
         <ProfileEditForm
@@ -88,21 +90,21 @@ export function ProfilePageClient({ user }: { user: ProfileViewUser }) {
           </div>
           <Button type="button" className="w-full sm:w-auto shrink-0 gradient-primary text-white border-0" onClick={() => setEditing(true)}>
             <Pencil className="mr-2 size-4" />
-            Edit profile
+            {messages.dashboard.editProfile}
           </Button>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-2 pt-0 px-4 sm:px-6 sm:grid-cols-2">
-          <Row label="Bio" value={getProfile(profile, "bio") as string | undefined} />
-          <Row label="Profession" value={getProfile(profile, "profession") as string | undefined} />
-          <Row label="Company" value={getProfile(profile, "company") as string | undefined} />
-          <Row label="SLC / SEE batch" value={getProfile(profile, "slcSeeBatch") as number | undefined} />
-          <Row label="Years studied at school" value={getProfile(profile, "schoolPeriod") as string | undefined} />
-          <Row label="Permanent address" value={getProfile(profile, "permanentAddress") as string | undefined} />
-          <Row label="Current city" value={getProfile(profile, "city") as string | undefined} />
-          <Row label="Country" value={getProfile(profile, "country") as string | undefined} />
-          <Row label="Phone" value={getProfile(profile, "phone") as string | undefined} />
-          <Row label="LinkedIn" value={getProfile(profile, "linkedin") as string | undefined} />
-          <Row label="Facebook" value={getProfile(profile, "facebook") as string | undefined} />
+          <Row label={messages.profile.bio} value={getProfile(profile, "bio") as string | undefined} />
+          <Row label={messages.profile.profession} value={getProfile(profile, "profession") as string | undefined} />
+          <Row label={messages.profile.company} value={getProfile(profile, "company") as string | undefined} />
+          <Row label={messages.profile.slcSeeBatch} value={getProfile(profile, "slcSeeBatch") as number | undefined} />
+          <Row label={messages.profile.schoolPeriod} value={getProfile(profile, "schoolPeriod") as string | undefined} />
+          <Row label={messages.profile.permanentAddress} value={getProfile(profile, "permanentAddress") as string | undefined} />
+          <Row label={messages.profile.city} value={getProfile(profile, "city") as string | undefined} />
+          <Row label={messages.profile.country} value={getProfile(profile, "country") as string | undefined} />
+          <Row label={messages.profile.phone} value={getProfile(profile, "phone") as string | undefined} />
+          <Row label={messages.profile.linkedin} value={getProfile(profile, "linkedin") as string | undefined} />
+          <Row label={messages.profile.facebook} value={getProfile(profile, "facebook") as string | undefined} />
         </CardContent>
       </Card>
 

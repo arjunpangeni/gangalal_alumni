@@ -3,6 +3,7 @@ import User from "@/lib/models/User";
 import { PageShell, PageHeader, PageEmptyState } from "@/components/layout/Page";
 import { Users } from "lucide-react";
 import { AdminUsersClient } from "./AdminUsersClient";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -30,9 +31,16 @@ export default async function AdminUsersPage() {
 
   return (
     <PageShell className="max-w-6xl px-0">
-      <PageHeader title="User management" description="Review signups, roles, and account status." />
+      <PageHeader
+        title={<I18nText id="adminUsers.title" fallback="User management" />}
+        description={<I18nText id="adminUsers.subtitle" fallback="Review signups, roles, and account status." />}
+      />
       {initialUsers.length === 0 ? (
-        <PageEmptyState icon={<Users className="size-10" />} title="No users" description="No accounts match the database query." />
+        <PageEmptyState
+          icon={<Users className="size-10" />}
+          title={<I18nText id="adminUsers.noUsers" fallback="No users" />}
+          description={<I18nText id="adminUsers.noUsersDesc" fallback="No accounts match the database query." />}
+        />
       ) : (
         <AdminUsersClient initialUsers={initialUsers} />
       )}

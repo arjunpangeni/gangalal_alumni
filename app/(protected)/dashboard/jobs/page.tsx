@@ -10,6 +10,7 @@ import { Briefcase, Pencil, Plus, MapPin, Calendar } from "lucide-react";
 import { redirect } from "next/navigation";
 import { PageShell, PageHeader, PageEmptyState } from "@/components/layout/Page";
 import { MyJobDeleteButton } from "./MyJobDeleteButton";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -36,7 +37,7 @@ function cardTone(status: string) {
 export default async function MyJobsPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
-  if (session.user.status !== "approved") redirect("/auth/pending");
+  if (session.user.status !== "approved") redirect("/pending");
 
   await connectDB();
   const raw = await Job.find({ authorId: session.user.id, deletedAt: null })
@@ -59,15 +60,15 @@ export default async function MyJobsPage() {
   return (
     <PageShell className="max-w-4xl px-0">
       <PageHeader
-        title="Jobs"
-        description="Post listings and manage drafts. Pending jobs are reviewed by an admin before they appear on the public board."
+        title={<I18nText id="dashboard.jobsPageTitle" fallback="Jobs" />}
+        description={<I18nText id="dashboard.jobsPageDescription" fallback="Post listings and manage drafts. Pending jobs are reviewed by an admin before they appear on the public board." />}
         action={
           <Link
             href="/dashboard/jobs/new"
             className={`${buttonVariants({})} gradient-primary text-white border-0 shrink-0 gap-2 justify-center w-full sm:w-auto`}
           >
             <Plus className="size-4" />
-            Post a job
+            <I18nText id="dashboard.postAJob" fallback="Post a job" />
           </Link>
         }
       />
@@ -75,8 +76,8 @@ export default async function MyJobsPage() {
       {jobs.length === 0 ? (
         <PageEmptyState
           icon={<Briefcase className="size-10" />}
-          title="You have not posted any jobs yet"
-          description="Create your first listing to get started."
+          title={<I18nText id="dashboard.noJobsYet" fallback="You have not posted any jobs yet" />}
+          description={<I18nText id="dashboard.createFirstListing" fallback="Create your first listing to get started." />}
           className="text-muted-foreground"
         />
       ) : (
@@ -115,12 +116,12 @@ export default async function MyJobsPage() {
                     <div className="flex flex-col gap-1.5 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-4">
                       <span className="inline-flex items-center gap-1.5">
                         <Calendar className="size-3.5 shrink-0 opacity-70" aria-hidden />
-                        Posted {formatDate(j.createdAt)}
+                        <I18nText id="dashboard.postedOn" fallback="Posted {date}" values={{ date: formatDate(j.createdAt) }} />
                       </span>
                       {j.expiresAt ? (
                         <span className="inline-flex items-center gap-1.5">
                           <Calendar className="size-3.5 shrink-0 opacity-70" aria-hidden />
-                          Deadline {formatDate(j.expiresAt)}
+                          <I18nText id="dashboard.deadlineOn" fallback="Deadline {date}" values={{ date: formatDate(j.expiresAt) }} />
                         </span>
                       ) : null}
                     </div>
@@ -131,7 +132,7 @@ export default async function MyJobsPage() {
                       className={`${buttonVariants({ variant: "outline" })} min-h-11 w-full gap-2 justify-center sm:min-h-10`}
                     >
                       <Pencil className="size-4 shrink-0" />
-                      Edit
+                      <I18nText id="dashboard.edit" fallback="Edit" />
                     </Link>
                     <MyJobDeleteButton slug={j.slug} title={j.title} />
                   </CardFooter>

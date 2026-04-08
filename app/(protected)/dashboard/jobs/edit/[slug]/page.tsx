@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { JobEditorForm } from "@/components/jobs/JobEditorForm";
 import { PageShell, PageHeader } from "@/components/layout/Page";
 import type { Metadata } from "next";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const unstable_dynamicStaleTime = 30;
 
@@ -17,7 +18,7 @@ export default async function EditJobPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
-  if (session.user.status !== "approved") redirect("/auth/pending");
+  if (session.user.status !== "approved") redirect("/pending");
 
   await connectDB();
   const job = await Job.findOne({ slug, deletedAt: null }).lean();
@@ -31,8 +32,8 @@ export default async function EditJobPage({ params }: { params: Promise<{ slug: 
   return (
     <PageShell narrow className="px-0">
       <PageHeader
-        title="Edit job listing"
-        description="Update details and save. Only you and admins can edit this post."
+        title={<I18nText id="dashboard.editJob" fallback="Edit job listing" />}
+        description={<I18nText id="dashboard.editJobDescription" fallback="Update details and save. Only you and admins can edit this post." />}
         className="mb-4 sm:mb-6"
       />
       {canPublishDirectly && (job.status as string) === "pending" ? (

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { GraduationCap } from "lucide-react";
 import type { Metadata } from "next";
 import { NETWORK_NAME } from "@/lib/brand";
+import { I18nText } from "@/components/i18n/I18nText";
 
 export const metadata: Metadata = { title: "Sign In" };
 
@@ -14,8 +15,8 @@ export default function LoginPage() {
           <div className="flex size-16 items-center justify-center rounded-2xl gradient-primary mx-auto mb-4">
             <GraduationCap className="size-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold">Welcome to {NETWORK_NAME}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Sign in to continue</p>
+          <h1 className="text-2xl font-bold"><I18nText id="authPages.welcomeTo" fallback={`Welcome to ${NETWORK_NAME}`} values={{ name: NETWORK_NAME }} /></h1>
+          <p className="mt-2 text-sm text-muted-foreground"><I18nText id="authPages.signInContinue" fallback="Sign in to continue" /></p>
         </div>
         <div className="rounded-2xl border bg-card p-6 shadow-lg">
           <form action={async () => {
@@ -29,11 +30,11 @@ export default function LoginPage() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              Continue with Google
+              <I18nText id="authPages.continueGoogle" fallback="Continue with Google" />
             </Button>
           </form>
           <p className="mt-4 text-center text-xs text-muted-foreground">
-            New members require admin verification after signing up.
+            <I18nText id="authPages.newMembersNotice" fallback="New members require admin verification after signing up." />
           </p>
         </div>
       </div>

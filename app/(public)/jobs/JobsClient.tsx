@@ -8,6 +8,7 @@ import { Building2, MapPin, ExternalLink, Briefcase, GraduationCap, Clock, Mail,
 import { formatDate } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { PageEmptyState } from "@/components/layout/Page";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 interface Job {
   _id: string;
@@ -27,6 +28,7 @@ interface Job {
 }
 
 export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
+  const { messages } = useI18n();
   const [jobs, setJobs] = useState<Job[]>(initialJobs as Job[]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -60,14 +62,14 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
     <div className="space-y-5 sm:space-y-6">
       <div className="flex flex-col gap-3 border-b border-border/50 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pb-5 lg:pb-4">
         <div className="min-w-0 flex-1">
-          <h1 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">Jobs</h1>
+          <h1 className="font-heading text-lg font-semibold tracking-tight text-foreground sm:text-xl">{messages.nav.jobs}</h1>
           <p className="mt-0.5 truncate text-xs leading-snug text-muted-foreground sm:text-sm">
-            Roles and openings shared within the alumni network.
+            {messages.publicClients.jobsSubtitle}
             {(!loading || jobs.length > 0) && (
               <span className="text-muted-foreground/80">
                 {" "}
                 · <span className="tabular-nums text-foreground/90">{jobs.length}</span>{" "}
-                {jobs.length === 1 ? "listing" : "listings"}
+                {jobs.length === 1 ? messages.publicClients.listing : messages.publicClients.listings}
               </span>
             )}
           </p>
@@ -78,18 +80,18 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
             aria-hidden
           />
           <Input
-            placeholder="Search…"
+            placeholder={messages.publicClients.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-9 rounded-lg border-border/60 bg-background/90 py-2 pl-8 pr-16 text-sm shadow-sm transition-surface dark:bg-background/50"
-            aria-label="Search jobs"
+            aria-label={messages.publicClients.searchJobs}
           />
           {search ? (
             <button
               type="button"
               onClick={() => setSearch("")}
               className="absolute right-8 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-surface hover:bg-muted hover:text-foreground"
-              aria-label="Clear search"
+              aria-label={messages.publicClients.clearSearch}
             >
               <X className="size-3.5" />
             </button>
@@ -102,6 +104,14 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
           ) : null}
         </div>
       </div>
+
+      <p
+        className="flex gap-2.5 rounded-xl border border-primary/20 bg-primary/[0.06] px-3.5 py-3 text-sm leading-relaxed text-foreground/90 shadow-sm dark:border-primary/25 dark:bg-primary/[0.09] sm:px-4 sm:py-3.5"
+        role="note"
+      >
+        <Briefcase className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+        <span>{messages.publicClients.postJobHint}</span>
+      </p>
 
       <div className="space-y-4 sm:space-y-5">
         {jobs.map((job) => (
@@ -133,7 +143,7 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
               {job.expiresAt ? (
                 <p className="mb-3 text-sm text-muted-foreground flex items-center gap-2">
                   <Clock className="size-4" />
-                  Apply by {formatDate(job.expiresAt)}
+                  {messages.publicClients.applyBy} {formatDate(job.expiresAt)}
                 </p>
               ) : null}
               {job.educationOrSkills ? (
@@ -145,7 +155,7 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
               <p className="text-sm text-foreground/90 leading-relaxed line-clamp-4 whitespace-pre-wrap">{job.description ?? ""}</p>
             </div>
             <div className="flex flex-col gap-3 shrink-0 w-full sm:w-auto sm:min-w-[12rem]">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center sm:text-left">Apply</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center sm:text-left">{messages.publicClients.apply}</p>
               <div className="flex flex-wrap gap-3 justify-center sm:flex-col sm:items-stretch">
                 {job.applyEmail?.trim() ? (
                   <>
@@ -155,7 +165,7 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
                     >
                       <span className="mb-1 flex items-center justify-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground sm:justify-start">
                         <Mail className="size-3.5 shrink-0 text-primary" aria-hidden />
-                        Email address
+                        {messages.publicClients.emailAddress}
                       </span>
                       {job.applyEmail.trim()}
                     </a>
@@ -164,7 +174,7 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
                       className={`${buttonVariants({ size: "default", variant: "default" })} order-2 gradient-primary w-full border-0 text-white inline-flex gap-2 shadow-sm`}
                     >
                       <Mail className="size-4" />
-                      Email
+                      {messages.public.email}
                     </a>
                   </>
                 ) : null}
@@ -174,7 +184,7 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
                     className={`${buttonVariants({ size: "default", variant: "outline" })} inline-flex gap-2`}
                   >
                     <Phone className="size-4" />
-                    Call / WhatsApp
+                    {messages.publicClients.callWhatsapp}
                   </a>
                 ) : null}
                 {job.applyUrl?.trim() ? (
@@ -185,7 +195,7 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
                 ) : null}
                 {!job.applyEmail?.trim() && !job.applyPhone?.trim() && !job.applyUrl?.trim() ? (
                   <span className={`${buttonVariants({ size: "default", variant: "secondary" })} cursor-default justify-center gap-2`}>
-                    Contact in description
+                    {messages.publicClients.contactInDescription}
                   </span>
                 ) : null}
               </div>
@@ -195,8 +205,8 @@ export function JobsClient({ initialJobs }: { initialJobs: unknown[] }) {
         {jobs.length === 0 && !loading && (
           <PageEmptyState
             icon={<Briefcase className="size-10" />}
-            title="No job listings yet"
-            description="New opportunities will appear here."
+            title={messages.publicClients.noJobListings}
+            description={messages.publicClients.newOpportunities}
           />
         )}
       </div>
