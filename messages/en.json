@@ -11,7 +11,8 @@
     "events": "Events",
     "jobs": "Jobs",
     "gallery": "Gallery",
-    "mentorship": "Mentorship"
+    "mentorship": "Mentorship",
+    "about": "About"
   },
   "auth": {
     "signIn": "Sign In",
@@ -197,6 +198,42 @@
     "email": "Email",
     "phone": "Phone",
     "address": "Address"
+  },
+  "aboutPage": {
+    "schoolLabel": "Gangalal Secondary School",
+    "title": "An Introduction",
+    "establishedTitle": "Establishment",
+    "establishedBody": "The school was established in 2031 B.S. Its current form was shaped through the merger of Chapakot Middle School (established in 2023 B.S.) and Shree Jeevanodaya Primary School (established in 2025 B.S.).",
+    "namingTitle": "Naming",
+    "namingBody": "The school was named after martyr Gangalal Shrestha. Ram Bhakta Bhandari, then Pradhanpancha of Suntalitar Village Panchayat, played a significant role in its establishment.",
+    "leadershipTitle": "Leadership",
+    "leadershipBody": "Krishna Prasad Shrestha served as the first principal, and currently Gopal Prasad Regmi is leading the school as principal.",
+    "achievementTitle": "Achievements",
+    "achievementBody": "Students educated at this school have earned PhDs and reached prestigious positions such as Government of Nepal Secretary, doctors, engineers, and chartered accountants, enhancing the school's legacy.",
+    "infrastructureTitle": "Current Capacity and Infrastructure",
+    "infrastructureBody": "At present, 630 students are studying up to Grade 12. The school owns 189 ropani of land and has 7 buildings.",
+    "forumTitle": "Gangalal Secondary School Alumni Forum",
+    "forumBackgroundTitle": "Background and Purpose",
+    "forumBackgroundBody": "With the goal of bringing all alumni together under one network, the 'Gangalal Secondary School Alumni Forum' was formed on 2081 Mangsir 15 B.S.",
+    "objectivesTitle": "Core Objectives",
+    "objectives": [
+      "Build familiarity and fraternity among all alumni.",
+      "Actively contribute to social welfare work in the Chapakot area.",
+      "Support the all-round development of the alma mater through the alumni forum.",
+      "Unite all students under one umbrella and establish a welfare fund.",
+      "Introduce welfare programs for alumni and provide support when needed."
+    ],
+    "worksTitle": "Major Works Completed by the Forum",
+    "works": [
+      "Institution registration: Formally registered 'Gangalal Secondary School Alumni Forum' at Chapakot Municipality.",
+      "Membership drive: Conducted membership distribution campaigns to organize former students.",
+      "Infrastructure support: Built a parent waiting area within the school premises for students and guardians.",
+      "Convention and committee: Held a convention on Maha Ashtami of Dashain, 2082 B.S., and selected a new working committee.",
+      "Training and recognition: Organized motivational sessions for students and guardians, and honored social workers, former teachers, outstanding teachers, and high-performing students.",
+      "Extra activities: Conducted school-level quiz and dance competitions, and successfully organized a grand cultural program featuring nationally renowned artists."
+    ],
+    "committeeTitle": "Committee",
+    "committeeSubtitle": "Committee members (displayed by configured priority order)."
   },
   "authPages": {
     "welcomeTo": "Welcome to {name}",

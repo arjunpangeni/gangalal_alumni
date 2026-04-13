@@ -32,6 +32,7 @@ const navLinks = [
   { href: "/jobs", key: "jobs" },
   { href: "/gallery", key: "gallery" },
   { href: "/mentorship", key: "mentorship" },
+  { href: "/about", key: "about" },
 ] as const;
 
 function JobsCountBadge({ count }: { count: number }) {
